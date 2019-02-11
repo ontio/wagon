@@ -8,17 +8,15 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io"
-	"math"
-
 	"github.com/go-interpreter/wagon/wasm/leb128"
+	"io"
 )
 
 const (
-	i32Const  byte = 0x41
-	i64Const  byte = 0x42
-	f32Const  byte = 0x43
-	f64Const  byte = 0x44
+	i32Const byte = 0x41
+	i64Const byte = 0x42
+	//f32Const  byte = 0x43
+	//f64Const  byte = 0x44
 	getGlobal byte = 0x23
 	end       byte = 0x0b
 )
@@ -59,14 +57,14 @@ outer:
 			if err != nil {
 				return nil, err
 			}
-		case f32Const:
-			if _, err := readU32(r); err != nil {
-				return nil, err
-			}
-		case f64Const:
-			if _, err := readU64(r); err != nil {
-				return nil, err
-			}
+		//case f32Const:
+		//	if _, err := readU32(r); err != nil {
+		//		return nil, err
+		//	}
+		//case f64Const:
+		//	if _, err := readU64(r); err != nil {
+		//		return nil, err
+		//	}
 		case getGlobal:
 			_, err := leb128.ReadVarUint32(r)
 			if err != nil {
@@ -121,20 +119,20 @@ func (m *Module) ExecInitExpr(expr []byte) (interface{}, error) {
 			}
 			stack = append(stack, uint64(i))
 			lastVal = ValueTypeI64
-		case f32Const:
-			i, err := readU32(r)
-			if err != nil {
-				return nil, err
-			}
-			stack = append(stack, uint64(i))
-			lastVal = ValueTypeF32
-		case f64Const:
-			i, err := readU64(r)
-			if err != nil {
-				return nil, err
-			}
-			stack = append(stack, i)
-			lastVal = ValueTypeF64
+		//case f32Const:
+		//	i, err := readU32(r)
+		//	if err != nil {
+		//		return nil, err
+		//	}
+		//	stack = append(stack, uint64(i))
+		//	lastVal = ValueTypeF32
+		//case f64Const:
+		//	i, err := readU64(r)
+		//	if err != nil {
+		//		return nil, err
+		//	}
+		//	stack = append(stack, i)
+		//	lastVal = ValueTypeF64
 		case getGlobal:
 			index, err := leb128.ReadVarUint32(r)
 			if err != nil {
@@ -162,10 +160,10 @@ func (m *Module) ExecInitExpr(expr []byte) (interface{}, error) {
 		return int32(v), nil
 	case ValueTypeI64:
 		return int64(v), nil
-	case ValueTypeF32:
-		return math.Float32frombits(uint32(v)), nil
-	case ValueTypeF64:
-		return math.Float64frombits(uint64(v)), nil
+	//case ValueTypeF32:
+	//	return math.Float32frombits(uint32(v)), nil
+	//case ValueTypeF64:
+	//	return math.Float64frombits(uint64(v)), nil
 	default:
 		panic(fmt.Sprintf("Invalid value type produced by initializer expression: %d", int8(lastVal)))
 	}

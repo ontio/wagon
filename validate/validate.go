@@ -73,7 +73,7 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 			}
 
 			switch wasm.ValueType(sig) {
-			case wasm.ValueTypeI32, wasm.ValueTypeI64, wasm.ValueTypeF32, wasm.ValueTypeF64, wasm.ValueType(wasm.BlockTypeEmpty):
+			case wasm.ValueTypeI32, wasm.ValueTypeI64, wasm.ValueType(wasm.BlockTypeEmpty):
 				vm.pushBlock(op, wasm.BlockType(sig))
 			default:
 				if !vm.isPolymorphic() {
@@ -184,16 +184,16 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 			if err != nil {
 				return vm, err
 			}
-		case ops.F32Const:
-			_, err := vm.fetchUint32()
-			if err != nil {
-				return vm, err
-			}
-		case ops.F64Const:
-			_, err := vm.fetchUint64()
-			if err != nil {
-				return vm, err
-			}
+		//case ops.F32Const:
+		//	_, err := vm.fetchUint32()
+		//	if err != nil {
+		//		return vm, err
+		//	}
+		//case ops.F64Const:
+		//	_, err := vm.fetchUint64()
+		//	if err != nil {
+		//		return vm, err
+		//	}
 		case ops.GetLocal, ops.SetLocal, ops.TeeLocal:
 			i, err := vm.fetchVarUint()
 			if err != nil {
@@ -236,7 +236,7 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 				}
 			}
 
-		case ops.I32Load, ops.I64Load, ops.F32Load, ops.F64Load, ops.I32Load8s, ops.I32Load8u, ops.I32Load16s, ops.I32Load16u, ops.I64Load8s, ops.I64Load8u, ops.I64Load16s, ops.I64Load16u, ops.I64Load32s, ops.I64Load32u, ops.I32Store, ops.I64Store, ops.F32Store, ops.F64Store, ops.I32Store8, ops.I32Store16, ops.I64Store8, ops.I64Store16, ops.I64Store32:
+		case ops.I32Load, ops.I64Load, ops.I32Load8s, ops.I32Load8u, ops.I32Load16s, ops.I32Load16u, ops.I64Load8s, ops.I64Load8u, ops.I64Load16s, ops.I64Load16u, ops.I64Load32s, ops.I64Load32u, ops.I32Store, ops.I64Store, ops.I32Store8, ops.I32Store16, ops.I64Store8, ops.I64Store16, ops.I64Store32:
 			// read memory_immediate
 			// flags
 			_, err := vm.fetchVarUint()

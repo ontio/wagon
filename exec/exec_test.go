@@ -273,6 +273,8 @@ func runTest(fileName string, testCases []testCase, t testing.TB) {
 		t.Fatalf("%s: %v", fileName, err)
 	}
 
+	vm.AvaliableGas = &exec.Gas{500,200000}
+
 	b, ok := t.(*testing.B)
 	for _, testCase := range testCases {
 		var expected interface{}

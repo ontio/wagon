@@ -310,8 +310,8 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 	}
 
 	res, err := vm.execCode(compiled)
-	if err != nil{
-		return nil, fmt.Errorf("exec:%v",err)
+	if err != nil {
+		return nil, fmt.Errorf("exec:%v", err)
 	}
 	if compiled.returns {
 		rtrnType := vm.module.GetFunction(int(fnIndex)).Sig.ReturnTypes[0]
@@ -320,10 +320,10 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 			rtrn = uint32(res)
 		case wasm.ValueTypeI64:
 			rtrn = uint64(res)
-		case wasm.ValueTypeF32:
-			rtrn = math.Float32frombits(uint32(res))
-		case wasm.ValueTypeF64:
-			rtrn = math.Float64frombits(res)
+		//case wasm.ValueTypeF32:
+		//	rtrn = math.Float32frombits(uint32(res))
+		//case wasm.ValueTypeF64:
+		//	rtrn = math.Float64frombits(res)
 		default:
 			return nil, InvalidReturnTypeError(rtrnType)
 		}
@@ -332,11 +332,11 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 	return rtrn, nil
 }
 
-func (vm *VM) execCode(compiled compiledFunction) (uint64,error) {
+func (vm *VM) execCode(compiled compiledFunction) (uint64, error) {
 outer:
 	for int(vm.ctx.pc) < len(vm.ctx.code) && !vm.abort {
-		if !vm.checkGas(1){
-			return 0,fmt.Errorf("exec:reach the gas limit")
+		if !vm.checkGas(1) {
+			return 0, fmt.Errorf("exec:reach the gas limit")
 		}
 		op := vm.ctx.code[vm.ctx.pc]
 		vm.ctx.pc++
@@ -412,18 +412,17 @@ outer:
 	if compiled.returns {
 		return vm.ctx.stack[len(vm.ctx.stack)-1], nil
 	}
-	return 0,nil
+	return 0, nil
 }
 
 //check gas
-func (vm *VM) checkGas(gaslimit uint64) bool{
+func (vm *VM) checkGas(gaslimit uint64) bool {
 	if vm.AvaliableGas.GasLimit >= gaslimit {
 		vm.AvaliableGas.GasLimit -= gaslimit
 		return true
 	}
 	return false
 }
-
 
 // Process is a proxy passed to host functions in order to access
 // things such as memory and control.

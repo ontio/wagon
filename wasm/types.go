@@ -27,15 +27,15 @@ type ValueType int8
 const (
 	ValueTypeI32 ValueType = -0x01
 	ValueTypeI64 ValueType = -0x02
-	ValueTypeF32 ValueType = -0x03
-	ValueTypeF64 ValueType = -0x04
+	//ValueTypeF32 ValueType = -0x03
+	//ValueTypeF64 ValueType = -0x04
 )
 
 var valueTypeStrMap = map[ValueType]string{
 	ValueTypeI32: "i32",
 	ValueTypeI64: "i64",
-	ValueTypeF32: "f32",
-	ValueTypeF64: "f64",
+	//ValueTypeF32: "f32",
+	//ValueTypeF64: "f64",
 }
 
 func (t ValueType) String() string {
@@ -55,6 +55,7 @@ func (t *ValueType) UnmarshalWASM(r io.Reader) error {
 		return err
 	}
 	*t = ValueType(v)
+
 	return nil
 }
 

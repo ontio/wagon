@@ -5,7 +5,6 @@
 package exec
 
 import (
-	"math"
 	"math/bits"
 )
 
@@ -319,190 +318,190 @@ func (vm *VM) i64GeU() {
 
 // float32 operators
 
-func (vm *VM) f32Abs() {
-	vm.pushFloat32(float32(math.Abs(float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Neg() {
-	vm.pushFloat32(-vm.popFloat32())
-}
-
-func (vm *VM) f32Ceil() {
-	vm.pushFloat32(float32(math.Ceil(float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Floor() {
-	vm.pushFloat32(float32(math.Floor(float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Trunc() {
-	vm.pushFloat32(float32(math.Trunc(float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Nearest() {
-	f := vm.popFloat32()
-	vm.pushFloat32(float32(int32(f + float32(math.Copysign(0.5, float64(f))))))
-}
-
-func (vm *VM) f32Sqrt() {
-	vm.pushFloat32(float32(math.Sqrt(float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Add() {
-	vm.pushFloat32(vm.popFloat32() + vm.popFloat32())
-}
-
-func (vm *VM) f32Sub() {
-	v2 := vm.popFloat32()
-	v1 := vm.popFloat32()
-	vm.pushFloat32(v1 - v2)
-}
-
-func (vm *VM) f32Mul() {
-	vm.pushFloat32(vm.popFloat32() * vm.popFloat32())
-}
-
-func (vm *VM) f32Div() {
-	v2 := vm.popFloat32()
-	v1 := vm.popFloat32()
-	vm.pushFloat32(v1 / v2)
-}
-
-func (vm *VM) f32Min() {
-	vm.pushFloat32(float32(math.Min(float64(vm.popFloat32()), float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Max() {
-	vm.pushFloat32(float32(math.Max(float64(vm.popFloat32()), float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Copysign() {
-	vm.pushFloat32(float32(math.Copysign(float64(vm.popFloat32()), float64(vm.popFloat32()))))
-}
-
-func (vm *VM) f32Eq() {
-	vm.pushBool(vm.popFloat32() == vm.popFloat32())
-}
-
-func (vm *VM) f32Ne() {
-	vm.pushBool(vm.popFloat32() != vm.popFloat32())
-}
-
-func (vm *VM) f32Lt() {
-	v2 := vm.popFloat32()
-	v1 := vm.popFloat32()
-	vm.pushBool(v1 < v2)
-}
-
-func (vm *VM) f32Gt() {
-	v2 := vm.popFloat32()
-	v1 := vm.popFloat32()
-	vm.pushBool(v1 > v2)
-}
-
-func (vm *VM) f32Le() {
-	v2 := vm.popFloat32()
-	v1 := vm.popFloat32()
-	vm.pushBool(v1 <= v2)
-}
-
-func (vm *VM) f32Ge() {
-	v2 := vm.popFloat32()
-	v1 := vm.popFloat32()
-	vm.pushBool(v1 >= v2)
-}
-
-// float64 operators
-
-func (vm *VM) f64Abs() {
-	vm.pushFloat64(math.Abs(vm.popFloat64()))
-}
-
-func (vm *VM) f64Neg() {
-	vm.pushFloat64(-vm.popFloat64())
-}
-
-func (vm *VM) f64Ceil() {
-	vm.pushFloat64(math.Ceil(vm.popFloat64()))
-}
-
-func (vm *VM) f64Floor() {
-	vm.pushFloat64(math.Floor(vm.popFloat64()))
-}
-
-func (vm *VM) f64Trunc() {
-	vm.pushFloat64(math.Trunc(vm.popFloat64()))
-}
-
-func (vm *VM) f64Nearest() {
-	f := vm.popFloat64()
-	vm.pushFloat64(float64(int64(f + math.Copysign(0.5, f))))
-}
-
-func (vm *VM) f64Sqrt() {
-	vm.pushFloat64(math.Sqrt(vm.popFloat64()))
-}
-
-func (vm *VM) f64Add() {
-	vm.pushFloat64(vm.popFloat64() + vm.popFloat64())
-}
-
-func (vm *VM) f64Sub() {
-	v2 := vm.popFloat64()
-	v1 := vm.popFloat64()
-	vm.pushFloat64(v1 - v2)
-}
-
-func (vm *VM) f64Mul() {
-	vm.pushFloat64(vm.popFloat64() * vm.popFloat64())
-}
-
-func (vm *VM) f64Div() {
-	v2 := vm.popFloat64()
-	v1 := vm.popFloat64()
-	vm.pushFloat64(v1 / v2)
-}
-
-func (vm *VM) f64Min() {
-	vm.pushFloat64(math.Min(vm.popFloat64(), vm.popFloat64()))
-}
-
-func (vm *VM) f64Max() {
-	vm.pushFloat64(math.Max(vm.popFloat64(), vm.popFloat64()))
-}
-
-func (vm *VM) f64Copysign() {
-	vm.pushFloat64(math.Copysign(vm.popFloat64(), vm.popFloat64()))
-}
-
-func (vm *VM) f64Eq() {
-	vm.pushBool(vm.popFloat64() == vm.popFloat64())
-}
-
-func (vm *VM) f64Ne() {
-	vm.pushBool(vm.popFloat64() != vm.popFloat64())
-}
-
-func (vm *VM) f64Lt() {
-	v2 := vm.popFloat64()
-	v1 := vm.popFloat64()
-	vm.pushBool(v1 < v2)
-}
-
-func (vm *VM) f64Gt() {
-	v2 := vm.popFloat64()
-	v1 := vm.popFloat64()
-	vm.pushBool(v1 > v2)
-}
-
-func (vm *VM) f64Le() {
-	v2 := vm.popFloat64()
-	v1 := vm.popFloat64()
-	vm.pushBool(v1 <= v2)
-}
-
-func (vm *VM) f64Ge() {
-	v2 := vm.popFloat64()
-	v1 := vm.popFloat64()
-	vm.pushBool(v1 >= v2)
-}
+//func (vm *VM) f32Abs() {
+//	vm.pushFloat32(float32(math.Abs(float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Neg() {
+//	vm.pushFloat32(-vm.popFloat32())
+//}
+//
+//func (vm *VM) f32Ceil() {
+//	vm.pushFloat32(float32(math.Ceil(float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Floor() {
+//	vm.pushFloat32(float32(math.Floor(float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Trunc() {
+//	vm.pushFloat32(float32(math.Trunc(float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Nearest() {
+//	f := vm.popFloat32()
+//	vm.pushFloat32(float32(int32(f + float32(math.Copysign(0.5, float64(f))))))
+//}
+//
+//func (vm *VM) f32Sqrt() {
+//	vm.pushFloat32(float32(math.Sqrt(float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Add() {
+//	vm.pushFloat32(vm.popFloat32() + vm.popFloat32())
+//}
+//
+//func (vm *VM) f32Sub() {
+//	v2 := vm.popFloat32()
+//	v1 := vm.popFloat32()
+//	vm.pushFloat32(v1 - v2)
+//}
+//
+//func (vm *VM) f32Mul() {
+//	vm.pushFloat32(vm.popFloat32() * vm.popFloat32())
+//}
+//
+//func (vm *VM) f32Div() {
+//	v2 := vm.popFloat32()
+//	v1 := vm.popFloat32()
+//	vm.pushFloat32(v1 / v2)
+//}
+//
+//func (vm *VM) f32Min() {
+//	vm.pushFloat32(float32(math.Min(float64(vm.popFloat32()), float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Max() {
+//	vm.pushFloat32(float32(math.Max(float64(vm.popFloat32()), float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Copysign() {
+//	vm.pushFloat32(float32(math.Copysign(float64(vm.popFloat32()), float64(vm.popFloat32()))))
+//}
+//
+//func (vm *VM) f32Eq() {
+//	vm.pushBool(vm.popFloat32() == vm.popFloat32())
+//}
+//
+//func (vm *VM) f32Ne() {
+//	vm.pushBool(vm.popFloat32() != vm.popFloat32())
+//}
+//
+//func (vm *VM) f32Lt() {
+//	v2 := vm.popFloat32()
+//	v1 := vm.popFloat32()
+//	vm.pushBool(v1 < v2)
+//}
+//
+//func (vm *VM) f32Gt() {
+//	v2 := vm.popFloat32()
+//	v1 := vm.popFloat32()
+//	vm.pushBool(v1 > v2)
+//}
+//
+//func (vm *VM) f32Le() {
+//	v2 := vm.popFloat32()
+//	v1 := vm.popFloat32()
+//	vm.pushBool(v1 <= v2)
+//}
+//
+//func (vm *VM) f32Ge() {
+//	v2 := vm.popFloat32()
+//	v1 := vm.popFloat32()
+//	vm.pushBool(v1 >= v2)
+//}
+//
+//// float64 operators
+//
+//func (vm *VM) f64Abs() {
+//	vm.pushFloat64(math.Abs(vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Neg() {
+//	vm.pushFloat64(-vm.popFloat64())
+//}
+//
+//func (vm *VM) f64Ceil() {
+//	vm.pushFloat64(math.Ceil(vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Floor() {
+//	vm.pushFloat64(math.Floor(vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Trunc() {
+//	vm.pushFloat64(math.Trunc(vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Nearest() {
+//	f := vm.popFloat64()
+//	vm.pushFloat64(float64(int64(f + math.Copysign(0.5, f))))
+//}
+//
+//func (vm *VM) f64Sqrt() {
+//	vm.pushFloat64(math.Sqrt(vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Add() {
+//	vm.pushFloat64(vm.popFloat64() + vm.popFloat64())
+//}
+//
+//func (vm *VM) f64Sub() {
+//	v2 := vm.popFloat64()
+//	v1 := vm.popFloat64()
+//	vm.pushFloat64(v1 - v2)
+//}
+//
+//func (vm *VM) f64Mul() {
+//	vm.pushFloat64(vm.popFloat64() * vm.popFloat64())
+//}
+//
+//func (vm *VM) f64Div() {
+//	v2 := vm.popFloat64()
+//	v1 := vm.popFloat64()
+//	vm.pushFloat64(v1 / v2)
+//}
+//
+//func (vm *VM) f64Min() {
+//	vm.pushFloat64(math.Min(vm.popFloat64(), vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Max() {
+//	vm.pushFloat64(math.Max(vm.popFloat64(), vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Copysign() {
+//	vm.pushFloat64(math.Copysign(vm.popFloat64(), vm.popFloat64()))
+//}
+//
+//func (vm *VM) f64Eq() {
+//	vm.pushBool(vm.popFloat64() == vm.popFloat64())
+//}
+//
+//func (vm *VM) f64Ne() {
+//	vm.pushBool(vm.popFloat64() != vm.popFloat64())
+//}
+//
+//func (vm *VM) f64Lt() {
+//	v2 := vm.popFloat64()
+//	v1 := vm.popFloat64()
+//	vm.pushBool(v1 < v2)
+//}
+//
+//func (vm *VM) f64Gt() {
+//	v2 := vm.popFloat64()
+//	v1 := vm.popFloat64()
+//	vm.pushBool(v1 > v2)
+//}
+//
+//func (vm *VM) f64Le() {
+//	v2 := vm.popFloat64()
+//	v1 := vm.popFloat64()
+//	vm.pushBool(v1 <= v2)
+//}
+//
+//func (vm *VM) f64Ge() {
+//	v2 := vm.popFloat64()
+//	v1 := vm.popFloat64()
+//	vm.pushBool(v1 >= v2)
+//}
