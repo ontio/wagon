@@ -98,8 +98,10 @@ func (compiled compiledFunction) call(vm *VM, index int64) {
 		curFunc: index,
 	}
 
-	rtrn := vm.execCode(compiled)
-
+	rtrn,err := vm.execCode(compiled)
+	if err != nil{
+		panic("errors happen will call method" )
+	}
 	//restore execution context
 	vm.ctx = prevCtxt
 
