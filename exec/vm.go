@@ -51,6 +51,11 @@ type context struct {
 	curFunc int64
 }
 
+type Gas struct {
+	GasPrice uint64
+	GasLimit uint64
+}
+
 // VM is the execution context for executing WebAssembly bytecode.
 type VM struct {
 	ctx context
@@ -70,6 +75,9 @@ type VM struct {
 	RecoverPanic bool
 
 	abort bool // Flag for host functions to terminate execution
+
+	//add for ontology gas limit
+	AvaliableGas *Gas
 }
 
 // As per the WebAssembly spec: https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/Semantics.md#linear-memory
@@ -272,7 +280,11 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 			if r := recover(); r != nil {
 				switch e := r.(type) {
 				case error:
-					err = e
+					if e.Error() == "return" {
+						err = nil
+					} else {
+						err = e
+					}
 				default:
 					err = fmt.Errorf("exec: %v", e)
 				}
@@ -301,7 +313,10 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 		vm.ctx.locals[i] = arg
 	}
 
-	res := vm.execCode(compiled)
+	res, err := vm.execCode(compiled)
+	if err != nil {
+		return nil, fmt.Errorf("exec:%v", err)
+	}
 	if compiled.returns {
 		rtrnType := vm.module.GetFunction(int(fnIndex)).Sig.ReturnTypes[0]
 		switch rtrnType {
@@ -321,9 +336,12 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 	return rtrn, nil
 }
 
-func (vm *VM) execCode(compiled compiledFunction) uint64 {
+func (vm *VM) execCode(compiled compiledFunction) (uint64, error) {
 outer:
 	for int(vm.ctx.pc) < len(vm.ctx.code) && !vm.abort {
+		if !vm.checkGas(1) {
+			return 0, fmt.Errorf("exec:reach the gas limit")
+		}
 		op := vm.ctx.code[vm.ctx.pc]
 		vm.ctx.pc++
 		switch op {
@@ -396,9 +414,18 @@ outer:
 	}
 
 	if compiled.returns {
-		return vm.ctx.stack[len(vm.ctx.stack)-1]
+		return vm.ctx.stack[len(vm.ctx.stack)-1], nil
 	}
-	return 0
+	return 0, nil
+}
+
+//check gas
+func (vm *VM) checkGas(gaslimit uint64) bool {
+	if vm.AvaliableGas.GasLimit >= gaslimit {
+		vm.AvaliableGas.GasLimit -= gaslimit
+		return true
+	}
+	return false
 }
 
 // Process is a proxy passed to host functions in order to access
