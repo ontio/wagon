@@ -51,6 +51,11 @@ type context struct {
 	curFunc int64
 }
 
+type Gas struct {
+	GasPrice uint64
+	GasLimit uint64
+}
+
 // VM is the execution context for executing WebAssembly bytecode.
 type VM struct {
 	ctx context
@@ -70,6 +75,9 @@ type VM struct {
 	RecoverPanic bool
 
 	abort bool // Flag for host functions to terminate execution
+
+	//add for ontology gas limit
+	AvaliableGas *Gas
 }
 
 // As per the WebAssembly spec: https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/Semantics.md#linear-memory
