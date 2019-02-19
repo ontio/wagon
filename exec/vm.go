@@ -159,6 +159,8 @@ func NewVM(module *wasm.Module) (*VM, error) {
 	}
 
 	if module.Start != nil {
+		//set a default gas
+		vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 200000}
 		_, err := vm.ExecCode(int64(module.Start.Index))
 		if err != nil {
 			return nil, err
@@ -280,9 +282,9 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 			if r := recover(); r != nil {
 				switch e := r.(type) {
 				case error:
-					if e.Error() == "return"{
+					if e.Error() == "return" {
 						err = nil
-					}else{
+					} else {
 						err = e
 					}
 				default:

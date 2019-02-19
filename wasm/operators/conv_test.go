@@ -24,7 +24,7 @@ func TestNewConversionOp(t *testing.T) {
 		returns wasm.ValueType
 	}{
 		{"i32.wrap/i64", []wasm.ValueType{wasm.ValueTypeI64}, wasm.ValueTypeI32},
-		{"i32.trunc_s/f32", []wasm.ValueType{wasm.ValueTypeF32}, wasm.ValueTypeI32},
+		//{"i32.trunc_s/f32", []wasm.ValueType{wasm.ValueTypeF32}, wasm.ValueTypeI32},
 	}
 
 	for i, testCase := range testCases {
