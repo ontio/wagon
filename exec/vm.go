@@ -51,6 +51,7 @@ type context struct {
 	curFunc int64
 }
 
+//add for Gas calculate
 type Gas struct {
 	GasPrice uint64
 	GasLimit uint64
