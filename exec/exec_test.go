@@ -273,7 +273,7 @@ func runTest(fileName string, testCases []testCase, t testing.TB) {
 		t.Fatalf("%s: %v", fileName, err)
 	}
 
-	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: 200000}
+	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: math.MaxUint64}
 
 	b, ok := t.(*testing.B)
 	for _, testCase := range testCases {

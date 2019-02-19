@@ -78,6 +78,7 @@ func TestHostCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error creating VM: %v", vm)
 	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
 
 	if len(vm.funcs) < 1 {
 		t.Fatalf("Need at least a start function!")
@@ -182,6 +183,8 @@ func TestHostSymbolCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+
 	rtrns, err := vm.ExecCode(1)
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)
@@ -209,6 +212,8 @@ func TestGoFunctionCallChecksForFirstArgument(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+
 	_, err = vm.ExecCode(1)
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)
@@ -229,6 +234,8 @@ func TestHostTerminate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+
 	_, err = vm.ExecCode(1)
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)

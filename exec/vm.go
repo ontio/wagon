@@ -159,6 +159,8 @@ func NewVM(module *wasm.Module) (*VM, error) {
 	}
 
 	if module.Start != nil {
+		//default situation not for blockchain vm
+		vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: math.MaxUint64}
 		_, err := vm.ExecCode(int64(module.Start.Index))
 		if err != nil {
 			return nil, err
