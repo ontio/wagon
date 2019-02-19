@@ -280,7 +280,11 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 			if r := recover(); r != nil {
 				switch e := r.(type) {
 				case error:
-					err = e
+					if e.Error() == "return"{
+						err = nil
+					}else{
+						err = e
+					}
 				default:
 					err = fmt.Errorf("exec: %v", e)
 				}
