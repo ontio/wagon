@@ -143,10 +143,10 @@ func NewVM(module *wasm.Module) (*VM, error) {
 			vm.globals[i] = uint64(v)
 		case int64:
 			vm.globals[i] = uint64(v)
-		case float32:
-			vm.globals[i] = uint64(math.Float32bits(v))
-		case float64:
-			vm.globals[i] = uint64(math.Float64bits(v))
+			//case float32:
+			//	vm.globals[i] = uint64(math.Float32bits(v))
+			//case float64:
+			//	vm.globals[i] = uint64(math.Float64bits(v))
 		}
 	}
 
@@ -309,10 +309,10 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 			rtrn = uint32(res)
 		case wasm.ValueTypeI64:
 			rtrn = uint64(res)
-		case wasm.ValueTypeF32:
-			rtrn = math.Float32frombits(uint32(res))
-		case wasm.ValueTypeF64:
-			rtrn = math.Float64frombits(res)
+		//case wasm.ValueTypeF32:
+		//	rtrn = math.Float32frombits(uint32(res))
+		//case wasm.ValueTypeF64:
+		//	rtrn = math.Float64frombits(res)
 		default:
 			return nil, InvalidReturnTypeError(rtrnType)
 		}

@@ -386,14 +386,14 @@ func (w *writer) writeCode(code []byte, isInit bool) {
 			}
 			w.Print("  ;; label = @%d", block)
 			continue
-		case operators.F32Const:
-			i1 := ins.Immediates[0].(float32)
-			w.WriteString(" " + formatFloat32(i1))
-			continue
-		case operators.F64Const:
-			i1 := ins.Immediates[0].(float64)
-			w.WriteString(" " + formatFloat64(i1))
-			continue
+		//case operators.F32Const:
+		//	i1 := ins.Immediates[0].(float32)
+		//	w.WriteString(" " + formatFloat32(i1))
+		//	continue
+		//case operators.F64Const:
+		//	i1 := ins.Immediates[0].(float64)
+		//	w.WriteString(" " + formatFloat64(i1))
+		//	continue
 		case operators.BrIf, operators.Br:
 			i1 := ins.Immediates[0].(uint32)
 			writeBlock(int(i1))
@@ -429,25 +429,25 @@ func (w *writer) writeCode(code []byte, isInit bool) {
 			operators.I32Store8, operators.I64Store8,
 			operators.I32Store16, operators.I64Store16,
 			operators.I64Store32,
-			operators.F32Store, operators.F64Store,
+			//operators.F32Store, operators.F64Store,
 			operators.I32Load, operators.I64Load,
 			operators.I32Load8u, operators.I32Load8s,
 			operators.I32Load16u, operators.I32Load16s,
 			operators.I64Load8u, operators.I64Load8s,
 			operators.I64Load16u, operators.I64Load16s,
-			operators.I64Load32u, operators.I64Load32s,
-			operators.F32Load, operators.F64Load:
+			operators.I64Load32u, operators.I64Load32s:
+			//operators.F32Load, operators.F64Load:
 
 			i1 := ins.Immediates[0].(uint32)
 			i2 := ins.Immediates[1].(uint32)
 			dst := 0 // in log 2 (i8)
 			switch ins.Op.Code {
-			case operators.I64Load, operators.I64Store,
-				operators.F64Load, operators.F64Store:
+			case operators.I64Load, operators.I64Store:
+				//operators.F64Load, operators.F64Store:
 				dst = 3
 			case operators.I32Load, operators.I64Load32s, operators.I64Load32u,
-				operators.I32Store, operators.I64Store32,
-				operators.F32Load, operators.F32Store:
+				operators.I32Store, operators.I64Store32:
+				//operators.F32Load, operators.F32Store:
 				dst = 2
 			case operators.I32Load16u, operators.I32Load16s, operators.I64Load16u, operators.I64Load16s,
 				operators.I32Store16, operators.I64Store16:
