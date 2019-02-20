@@ -941,15 +941,6 @@
     ]
   },
   {
-    "file": "start.wasm",
-    "tests": [
-      {
-        "function": "get",
-        "return": "i32:42"
-      }
-    ]
-  },
-  {
     "file": "store.wasm",
     "tests": [
       {

@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/wasm"
+	"math"
 )
 
 func ExampleVM_add() {
@@ -86,6 +87,7 @@ func ExampleVM_add() {
 	if err != nil {
 		log.Fatalf("could not create wagon vm: %v", err)
 	}
+	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: math.MaxUint64}
 
 	const fct1 = 2 // index of function fct1
 	out, err := vm.ExecCode(fct1)

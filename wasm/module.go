@@ -162,6 +162,11 @@ func ReadModule(r io.Reader, resolvePath ResolveFunc) (*Module, error) {
 
 	}
 
+	//for smart contract , start entry is not supported
+	if m.Start != nil {
+		return nil, errors.New("start entry is not supported in smart contract")
+	}
+
 	logger.Printf("There are %d entries in the function index space.", len(m.FunctionIndexSpace))
 	return m, nil
 }
