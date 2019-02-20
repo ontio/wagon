@@ -62,6 +62,7 @@ func run(w io.Writer, fname string, verify bool) {
 	if err != nil {
 		log.Fatalf("could not create VM: %v", err)
 	}
+	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: 1000000}
 
 	for name, e := range m.Export.Entries {
 		i := int64(e.Index)

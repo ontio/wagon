@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"testing"
 
+	"fmt"
 	"github.com/go-interpreter/wagon/wasm"
 )
 
@@ -23,7 +24,7 @@ func TestHostCall(t *testing.T) {
 	}
 
 	m := wasm.NewModule()
-	m.Start = &wasm.SectionStartFunction{Index: 0}
+	m.Start = nil
 
 	// A function signature. Both the host and WASM function
 	// have the same signature.
@@ -76,9 +77,11 @@ func TestHostCall(t *testing.T) {
 	// function.
 	vm, err := NewVM(m)
 	if err != nil {
+		fmt.Printf("error is %s\n", err.Error())
 		t.Fatalf("Error creating VM: %v", vm)
 	}
-
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+	vm.ExecCode(0)
 	if len(vm.funcs) < 1 {
 		t.Fatalf("Need at least a start function!")
 	}
@@ -182,6 +185,8 @@ func TestHostSymbolCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+
 	rtrns, err := vm.ExecCode(1)
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)
@@ -209,6 +214,8 @@ func TestGoFunctionCallChecksForFirstArgument(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+
 	_, err = vm.ExecCode(1)
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)
@@ -229,6 +236,8 @@ func TestHostTerminate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+
 	_, err = vm.ExecCode(1)
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)
