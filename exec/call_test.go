@@ -9,88 +9,88 @@ import (
 	"reflect"
 	"testing"
 
+	"fmt"
 	"github.com/go-interpreter/wagon/wasm"
 )
 
-//
-//func TestHostCall(t *testing.T) {
-//	const secretValue = 0xdeadbeef
-//
-//	var secretVariable int
-//
-//	// a host function that can be called by WASM code.
-//	testHostFunction := func(proc *Process) {
-//		secretVariable = secretValue
-//	}
-//
-//	m := wasm.NewModule()
-//	m.Start = &wasm.SectionStartFunction{Index: 0}
-//
-//	// A function signature. Both the host and WASM function
-//	// have the same signature.
-//	fsig := wasm.FunctionSig{
-//		Form:        0,
-//		ParamTypes:  []wasm.ValueType{},
-//		ReturnTypes: []wasm.ValueType{},
-//	}
-//
-//	// List of all function types available in this module.
-//	// There is only one: (func [] -> [])
-//	m.Types = &wasm.SectionTypes{
-//		Entries: []wasm.FunctionSig{fsig, fsig},
-//	}
-//
-//	m.Function = &wasm.SectionFunctions{
-//		Types: []uint32{0, 0},
-//	}
-//
-//	// The body of the start function, that should only
-//	// call the host function
-//	fb := wasm.FunctionBody{
-//		Module: m,
-//		Locals: []wasm.LocalEntry{},
-//		// code should disassemble to:
-//		// call 1 (which is host)
-//		// end
-//		Code: []byte{0x02, 0x00, 0x10, 0x01, 0x0b},
-//	}
-//
-//	// There was no call to `ReadModule` so this part emulates
-//	// how the module object would look like if the function
-//	// had been called.
-//	m.FunctionIndexSpace = []wasm.Function{
-//		{
-//			Sig:  &fsig,
-//			Body: &fb,
-//		},
-//		{
-//			Sig:  &fsig,
-//			Host: reflect.ValueOf(testHostFunction),
-//		},
-//	}
-//
-//	m.Code = &wasm.SectionCode{
-//		Bodies: []wasm.FunctionBody{fb},
-//	}
-//
-//	// Once called, NewVM will execute the module's main
-//	// function.
-//	vm, err := NewVM(m)
-//	if err != nil {
-//		fmt.Printf("error is %s\n",err.Error())
-//		t.Fatalf("Error creating VM: %v", vm)
-//	}
-//	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
-//
-//	if len(vm.funcs) < 1 {
-//		t.Fatalf("Need at least a start function!")
-//	}
-//
-//	// Only one entry, which should be a function
-//	if secretVariable != secretValue {
-//		t.Fatalf("x is %d instead of %d", secretVariable, secretValue)
-//	}
-//}
+func TestHostCall(t *testing.T) {
+	const secretValue = 0xdeadbeef
+
+	var secretVariable int
+
+	// a host function that can be called by WASM code.
+	testHostFunction := func(proc *Process) {
+		secretVariable = secretValue
+	}
+
+	m := wasm.NewModule()
+	m.Start = nil
+
+	// A function signature. Both the host and WASM function
+	// have the same signature.
+	fsig := wasm.FunctionSig{
+		Form:        0,
+		ParamTypes:  []wasm.ValueType{},
+		ReturnTypes: []wasm.ValueType{},
+	}
+
+	// List of all function types available in this module.
+	// There is only one: (func [] -> [])
+	m.Types = &wasm.SectionTypes{
+		Entries: []wasm.FunctionSig{fsig, fsig},
+	}
+
+	m.Function = &wasm.SectionFunctions{
+		Types: []uint32{0, 0},
+	}
+
+	// The body of the start function, that should only
+	// call the host function
+	fb := wasm.FunctionBody{
+		Module: m,
+		Locals: []wasm.LocalEntry{},
+		// code should disassemble to:
+		// call 1 (which is host)
+		// end
+		Code: []byte{0x02, 0x00, 0x10, 0x01, 0x0b},
+	}
+
+	// There was no call to `ReadModule` so this part emulates
+	// how the module object would look like if the function
+	// had been called.
+	m.FunctionIndexSpace = []wasm.Function{
+		{
+			Sig:  &fsig,
+			Body: &fb,
+		},
+		{
+			Sig:  &fsig,
+			Host: reflect.ValueOf(testHostFunction),
+		},
+	}
+
+	m.Code = &wasm.SectionCode{
+		Bodies: []wasm.FunctionBody{fb},
+	}
+
+	// Once called, NewVM will execute the module's main
+	// function.
+	vm, err := NewVM(m)
+	if err != nil {
+		fmt.Printf("error is %s\n", err.Error())
+		t.Fatalf("Error creating VM: %v", vm)
+	}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+	vm.ExecCode(0)
+	if len(vm.funcs) < 1 {
+		t.Fatalf("Need at least a start function!")
+	}
+
+	// Only one entry, which should be a function
+	if secretVariable != secretValue {
+		t.Fatalf("x is %d instead of %d", secretVariable, secretValue)
+	}
+}
 
 var moduleCallHost = []byte{
 	0x00, 0x61, 0x73, 0x6D, 0x01, 0x00, 0x00, 0x00, 0x01, 0x1A, 0x06, 0x60, 0x01, 0x7F, 0x00, 0x60,
