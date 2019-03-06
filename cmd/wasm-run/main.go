@@ -14,6 +14,7 @@ import (
 	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/validate"
 	"github.com/go-interpreter/wagon/wasm"
+	"math"
 )
 
 func main() {
@@ -58,7 +59,7 @@ func run(w io.Writer, fname string, verify bool) {
 		log.Fatalf("module has no export section")
 	}
 
-	vm, err := exec.NewVM(m)
+	vm, err := exec.NewVM(m, math.MaxUint64)
 	if err != nil {
 		log.Fatalf("could not create VM: %v", err)
 	}

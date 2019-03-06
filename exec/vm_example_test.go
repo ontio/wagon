@@ -83,7 +83,7 @@ func ExampleVM_add() {
 		log.Fatalf("could not read module: %v", err)
 	}
 
-	vm, err := exec.NewVM(m)
+	vm, err := exec.NewVM(m, math.MaxUint64)
 	if err != nil {
 		log.Fatalf("could not create wagon vm: %v", err)
 	}

@@ -11,6 +11,7 @@ import (
 
 	"fmt"
 	"github.com/go-interpreter/wagon/wasm"
+	"math"
 )
 
 func TestHostCall(t *testing.T) {
@@ -75,7 +76,7 @@ func TestHostCall(t *testing.T) {
 
 	// Once called, NewVM will execute the module's main
 	// function.
-	vm, err := NewVM(m)
+	vm, err := NewVM(m, math.MaxUint64)
 	if err != nil {
 		fmt.Printf("error is %s\n", err.Error())
 		t.Fatalf("Error creating VM: %v", vm)
@@ -181,7 +182,7 @@ func TestHostSymbolCall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not read module: %v", err)
 	}
-	vm, err := NewVM(m)
+	vm, err := NewVM(m, math.MaxUint64)
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
@@ -210,7 +211,7 @@ func TestGoFunctionCallChecksForFirstArgument(t *testing.T) {
 			}
 		}
 	}()
-	vm, err := NewVM(m)
+	vm, err := NewVM(m, math.MaxUint64)
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
@@ -232,7 +233,7 @@ func TestHostTerminate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not read module: %v", err)
 	}
-	vm, err := NewVM(m)
+	vm, err := NewVM(m, math.MaxUint64)
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}

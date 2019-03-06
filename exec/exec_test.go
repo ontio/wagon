@@ -268,7 +268,7 @@ func runTest(fileName string, testCases []testCase, t testing.TB) {
 		t.Fatalf("%s: %v", fileName, err)
 	}
 
-	vm, err := exec.NewVM(module)
+	vm, err := exec.NewVM(module, math.MaxUint64)
 	if err != nil {
 		t.Fatalf("%s: %v", fileName, err)
 	}
