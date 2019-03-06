@@ -489,6 +489,10 @@ func (proc *Process) WriteAt(p []byte, off int64) (int, error) {
 	return length, err
 }
 
+func (proc *Process) MemAllocated() int {
+	return len(proc.vm.Memory())
+}
+
 // Terminate stops the execution of the current module.
 func (proc *Process) Terminate() {
 	proc.vm.abort = true
