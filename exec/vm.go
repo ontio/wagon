@@ -78,6 +78,9 @@ type VM struct {
 
 	//add for ontology gas limit
 	AvaliableGas *Gas
+
+	//memory limitation
+	MemoryLimitation uint64
 }
 
 // As per the WebAssembly spec: https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/Semantics.md#linear-memory
@@ -87,14 +90,20 @@ var endianess = binary.LittleEndian
 
 // NewVM creates a new VM from a given module. If the module defines a
 // start function, it will be executed.
-func NewVM(module *wasm.Module) (*VM, error) {
+func NewVM(module *wasm.Module, memLimit uint64) (*VM, error) {
 	var vm VM
 
 	if module.Memory != nil && len(module.Memory.Entries) != 0 {
 		if len(module.Memory.Entries) > 1 {
 			return nil, ErrMultipleLinearMemories
 		}
-		vm.memory = make([]byte, uint(module.Memory.Entries[0].Limits.Initial)*wasmPageSize)
+
+		memsize := uint(module.Memory.Entries[0].Limits.Initial) * wasmPageSize
+		if uint64(memsize) > memLimit {
+			return nil, fmt.Errorf("memory is exceed the limitation of %d", memLimit)
+		}
+		vm.MemoryLimitation = memLimit
+		vm.memory = make([]byte, memsize)
 		copy(vm.memory, module.LinearMemoryIndexSpace[0])
 	}
 
