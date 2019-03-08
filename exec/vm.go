@@ -88,10 +88,15 @@ const wasmPageSize = 65536 // (64 KB)
 
 var endianess = binary.LittleEndian
 
-// NewVM creates a new VM from a given module. If the module defines a
-// start function, it will be executed.
-func NewVM(module *wasm.Module, memLimit uint64) (*VM, error) {
-	var vm VM
+type CompiledModule struct {
+	rawModule *wasm.Module
+	globals   []uint64
+	memory    []byte
+	funcs     []function
+}
+
+func CompileModule(module *wasm.Module) (*CompiledModule, error) {
+	var compiled CompiledModule
 
 	if module.Memory != nil && len(module.Memory.Entries) != 0 {
 		if len(module.Memory.Entries) > 1 {
@@ -99,18 +104,13 @@ func NewVM(module *wasm.Module, memLimit uint64) (*VM, error) {
 		}
 
 		memsize := uint(module.Memory.Entries[0].Limits.Initial) * wasmPageSize
-		if uint64(memsize) > memLimit {
-			return nil, fmt.Errorf("memory is exceed the limitation of %d", memLimit)
-		}
-		vm.MemoryLimitation = memLimit
-		vm.memory = make([]byte, memsize)
-		copy(vm.memory, module.LinearMemoryIndexSpace[0])
+		compiled.memory = make([]byte, memsize)
+		copy(compiled.memory, module.LinearMemoryIndexSpace[0])
 	}
 
-	vm.funcs = make([]function, len(module.FunctionIndexSpace))
-	vm.globals = make([]uint64, len(module.GlobalIndexSpace))
-	vm.newFuncTable()
-	vm.module = module
+	compiled.funcs = make([]function, len(module.FunctionIndexSpace))
+	compiled.globals = make([]uint64, len(module.GlobalIndexSpace))
+	compiled.rawModule = module
 
 	nNatives := 0
 	for i, fn := range module.FunctionIndexSpace {
@@ -121,7 +121,7 @@ func NewVM(module *wasm.Module, memLimit uint64) (*VM, error) {
 		// section of:
 		// https://webassembly.github.io/spec/core/exec/modules.html#allocation
 		if fn.IsHost() {
-			vm.funcs[i] = goFunction{
+			compiled.funcs[i] = goFunction{
 				typ: fn.Host.Type(),
 				val: fn.Host,
 			}
@@ -140,7 +140,7 @@ func NewVM(module *wasm.Module, memLimit uint64) (*VM, error) {
 			totalLocalVars += int(entry.Count)
 		}
 		code, table := compile.Compile(disassembly.Code)
-		vm.funcs[i] = compiledFunction{
+		compiled.funcs[i] = compiledFunction{
 			code:           code,
 			branchTables:   table,
 			maxDepth:       disassembly.MaxDepth,
@@ -157,25 +157,56 @@ func NewVM(module *wasm.Module, memLimit uint64) (*VM, error) {
 		}
 		switch v := val.(type) {
 		case int32:
-			vm.globals[i] = uint64(v)
+			compiled.globals[i] = uint64(v)
 		case int64:
-			vm.globals[i] = uint64(v)
+			compiled.globals[i] = uint64(v)
 			//case float32:
-			//	vm.globals[i] = uint64(math.Float32bits(v))
+			//	compiled.globals[i] = uint64(math.Float32bits(v))
 			//case float64:
-			//	vm.globals[i] = uint64(math.Float64bits(v))
+			//	compiled.globals[i] = uint64(math.Float64bits(v))
 		}
 	}
 
 	if module.Start != nil {
-		//_, err := vm.ExecCode(int64(module.Start.Index))
+		//_, err := compiled.ExecCode(int64(module.Start.Index))
 		//if err != nil {
 		//	return nil, err
 		//}
 		return nil, errors.New("start entry is not supported in smart contract")
 	}
 
+	return &compiled, nil
+}
+
+func NewVMWithCompiled(module *CompiledModule, memLimit uint64) (*VM, error) {
+	var vm VM
+
+	memsize := len(module.memory)
+	if uint64(memsize) > memLimit {
+		return nil, fmt.Errorf("memory is exceed the limitation of %d", memLimit)
+	}
+	vm.MemoryLimitation = memLimit
+	vm.memory = make([]byte, memsize)
+	copy(vm.memory, module.memory)
+
+	vm.funcs = module.funcs
+	vm.globals = make([]uint64, len(module.rawModule.GlobalIndexSpace))
+	copy(vm.globals, module.globals)
+	vm.newFuncTable()
+	vm.module = module.rawModule
+
 	return &vm, nil
+}
+
+// NewVM creates a new VM from a given module. If the module defines a
+// start function, it will be executed.
+func NewVM(module *wasm.Module, memLimit uint64) (*VM, error) {
+	compiled, err := CompileModule(module)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewVMWithCompiled(compiled, memLimit)
 }
 
 // Memory returns the linear memory space for the VM.
