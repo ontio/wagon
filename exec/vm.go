@@ -79,6 +79,8 @@ type VM struct {
 	//add for ontology gas limit
 	AvaliableGas *Gas
 
+	HostData interface{}
+
 	//memory limitation
 	MemoryLimitation uint64
 }
@@ -527,4 +529,8 @@ func (proc *Process) MemAllocated() int {
 // Terminate stops the execution of the current module.
 func (proc *Process) Terminate() {
 	proc.vm.abort = true
+}
+
+func (proc *Process) HostData() interface{} {
+	return proc.vm.HostData
 }
