@@ -467,6 +467,10 @@ func (vm *VM) checkGas(gaslimit uint64) bool {
 	return false
 }
 
+func (vm *VM) GetModule() *wasm.Module {
+	return vm.module
+}
+
 // Process is a proxy passed to host functions in order to access
 // things such as memory and control.
 type Process struct {
