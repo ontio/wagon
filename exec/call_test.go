@@ -11,6 +11,7 @@ import (
 
 	"fmt"
 	"github.com/go-interpreter/wagon/wasm"
+	"github.com/stretchr/testify/assert"
 	"math"
 )
 
@@ -82,6 +83,8 @@ func TestHostCall(t *testing.T) {
 		t.Fatalf("Error creating VM: %v", vm)
 	}
 	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+	vm.CallStackDepth = 10000
+
 	vm.ExecCode(0)
 	if len(vm.funcs) < 1 {
 		t.Fatalf("Need at least a start function!")
@@ -187,6 +190,7 @@ func TestHostSymbolCall(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+	vm.CallStackDepth = 10000
 
 	rtrns, err := vm.ExecCode(1)
 	if err != nil {
@@ -216,6 +220,7 @@ func TestGoFunctionCallChecksForFirstArgument(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+	vm.CallStackDepth = 10000
 
 	_, err = vm.ExecCode(1)
 	if err != nil {
@@ -238,6 +243,7 @@ func TestHostTerminate(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
+	vm.CallStackDepth = 10000
 
 	_, err = vm.ExecCode(1)
 	if err != nil {
@@ -246,4 +252,33 @@ func TestHostTerminate(t *testing.T) {
 	if vm.abort == false || vm.ctx.pc > 0xa {
 		t.Fatalf("Terminate did not abort execution: abort=%v, pc=%#x", vm.abort, vm.ctx.pc)
 	}
+}
+
+//
+func TestInfiniteRecursion(t *testing.T) {
+	byteCode := []byte{
+		0x00, 0x61, 0x73, 0x6d, 0x30, 0x30, 0x30, 0x30, 0x01, 0x30,
+		0x01, 0x30, 0x00, 0x00, 0x03, 0x30, 0x01, 0x00, 0x07, 0x30,
+		0x01, 0x06, 0x69, 0x6e, 0x76, 0x6f, 0x6b, 0x65, 0x30, 0x00,
+		0x0a, 0x30, 0x01, 0x08, 0x00, 0x10, 0x00, 0x00, 0x30, 0x30,
+		0x30, 0x0b,
+	}
+	m, _ := wasm.ReadModule(bytes.NewReader(byteCode), func(name string) (*wasm.Module, error) {
+		return nil, fmt.Errorf("module %q unknown", name)
+	})
+	// this code follows ontology/smartcontract/wasmvm/wasm_service.go:Invoke(), with
+	// some error checking removed for brevity.
+	compiled, _ := CompileModule(m)
+	vm, err := NewVMWithCompiled(compiled, 10*1024*1024)
+	if err != nil {
+		t.Fatalf("Could not instantiate vm: %v", err)
+	}
+	vm.RecoverPanic = true
+	vm.AvaliableGas = &Gas{GasLimit: 100000000, GasPrice: 100}
+	vm.CallStackDepth = 1000
+	entry, _ := compiled.RawModule.Export.Entries["invoke"]
+	index := int64(entry.Index)
+	_, err = vm.ExecCode(index)
+	assert.NotNil(t, err)
+	fmt.Printf("err:%s\n", err.Error())
 }
