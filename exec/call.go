@@ -15,15 +15,25 @@ var (
 	// an invalid index to the module's table space is used as an operand to
 	// call_indirect
 	ErrUndefinedElementIndex = errors.New("exec: undefined element index")
+	// check call stack depth
+	ErrCallStackDepthExceed = errors.New("exec: call stack depth exceeded")
 )
 
 func (vm *VM) call() {
+	vm.checkCallStackDepth()
+	defer func() {
+		vm.CallStackDepth++
+	}()
 	index := vm.fetchUint32()
 
 	vm.funcs[index].call(vm, int64(index))
 }
 
 func (vm *VM) callIndirect() {
+	vm.checkCallStackDepth()
+	defer func() {
+		vm.CallStackDepth++
+	}()
 	index := vm.fetchUint32()
 	fnExpect := vm.module.Types.Entries[index]
 	_ = vm.fetchUint32() // reserved (https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/BinaryEncoding.md#call-operators-described-here)
