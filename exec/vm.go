@@ -542,7 +542,8 @@ func (proc *Process) WriteAt(p []byte, off int64) (int, error) {
 	return length, err
 }
 
-func (proc *Process) MemAllocated() int {
+// MemSize returns the current allocated memory size in bytes.
+func (proc *Process) MemSize() int {
 	return len(proc.vm.Memory())
 }
 
