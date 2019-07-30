@@ -83,7 +83,7 @@ func TestHostCall(t *testing.T) {
 		t.Fatalf("Error creating VM: %v", vm)
 	}
 	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
-	vm.CallStackDepth = 10000
+	vm.CallStackDepth = 1
 
 	vm.ExecCode(0)
 	if len(vm.funcs) < 1 {
@@ -190,7 +190,7 @@ func TestHostSymbolCall(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
-	vm.CallStackDepth = 10000
+	vm.CallStackDepth = 1
 
 	rtrns, err := vm.ExecCode(1)
 	if err != nil {
@@ -243,7 +243,7 @@ func TestHostTerminate(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: 1000000}
-	vm.CallStackDepth = 10000
+	vm.CallStackDepth = 1
 
 	_, err = vm.ExecCode(1)
 	if err != nil {
@@ -275,7 +275,7 @@ func TestInfiniteRecursion(t *testing.T) {
 	}
 	vm.RecoverPanic = true
 	vm.AvaliableGas = &Gas{GasLimit: 100000000, GasPrice: 100}
-	vm.CallStackDepth = 1000
+	vm.CallStackDepth = 100000
 	entry, _ := compiled.RawModule.Export.Entries["invoke"]
 	index := int64(entry.Index)
 	_, err = vm.ExecCode(index)

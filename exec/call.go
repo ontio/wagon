@@ -21,6 +21,9 @@ var (
 
 func (vm *VM) call() {
 	vm.checkCallStackDepth()
+	defer func() {
+		vm.CallStackDepth++
+	}()
 	index := vm.fetchUint32()
 
 	vm.funcs[index].call(vm, int64(index))
@@ -28,6 +31,9 @@ func (vm *VM) call() {
 
 func (vm *VM) callIndirect() {
 	vm.checkCallStackDepth()
+	defer func() {
+		vm.CallStackDepth++
+	}()
 	index := vm.fetchUint32()
 	fnExpect := vm.module.Types.Entries[index]
 	_ = vm.fetchUint32() // reserved (https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/BinaryEncoding.md#call-operators-described-here)
