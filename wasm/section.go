@@ -132,8 +132,10 @@ func (m *Module) readSection(r *readpos.ReadPos) (bool, error) {
 	s.Start = r.CurPos
 
 	sectionBytes := new(bytes.Buffer)
-	sectionBytes.Grow(int(payloadDataLen))
-	sectionReader := io.LimitReader(io.TeeReader(r, sectionBytes), int64(payloadDataLen))
+
+	initialCap := min(payloadDataLen, MAX_INIATIAL_CAP)
+	sectionBytes.Grow(int(initialCap))
+	sectionReader := io.LimitReader(io.TeeReader(r, sectionBytes), int64(initialCap))
 
 	var sec Section
 	switch s.ID {
@@ -268,11 +270,14 @@ func (s *SectionTypes) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Entries = make([]FunctionSig, int(count))
-	for i := range s.Entries {
-		if err = s.Entries[i].UnmarshalWASM(r); err != nil {
+
+	s.Entries = make([]FunctionSig, 0)
+	for i := uint32(0); i < count; i++ {
+		sig := FunctionSig{}
+		if err := sig.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Entries = append(s.Entries, sig)
 	}
 	return nil
 }
@@ -307,12 +312,14 @@ func (s *SectionImports) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Entries = make([]ImportEntry, count)
-	for i := range s.Entries {
-		err = s.Entries[i].UnmarshalWASM(r)
-		if err != nil {
+
+	s.Entries = make([]ImportEntry, 0)
+	for i := uint32(0); i < count; i++ {
+		entry := ImportEntry{}
+		if err := entry.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Entries = append(s.Entries, entry)
 	}
 	return nil
 }
@@ -413,13 +420,13 @@ func (s *SectionFunctions) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Types = make([]uint32, count)
-	for i := range s.Types {
+	s.Types = make([]uint32, 0)
+	for i := 0; i < int(count); i++ {
 		t, err := leb128.ReadVarUint32(r)
 		if err != nil {
 			return err
 		}
-		s.Types[i] = t
+		s.Types = append(s.Types, t)
 	}
 	return nil
 }
@@ -451,12 +458,14 @@ func (s *SectionTables) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Entries = make([]Table, count)
-	for i := range s.Entries {
-		err = s.Entries[i].UnmarshalWASM(r)
-		if err != nil {
+
+	s.Entries = make([]Table, 0)
+	for i := 0; i < int(count); i++ {
+		entry := Table{}
+		if err = entry.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Entries = append(s.Entries, entry)
 	}
 	return nil
 }
@@ -488,12 +497,13 @@ func (s *SectionMemories) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Entries = make([]Memory, count)
-	for i := range s.Entries {
-		err = s.Entries[i].UnmarshalWASM(r)
-		if err != nil {
+	s.Entries = make([]Memory, 0)
+	for i := 0; i < int(count); i++ {
+		entry := Memory{}
+		if err = entry.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Entries = append(s.Entries, entry)
 	}
 	return nil
 }
@@ -525,13 +535,15 @@ func (s *SectionGlobals) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Globals = make([]GlobalEntry, count)
+
+	s.Globals = make([]GlobalEntry, 0)
 	logger.Printf("%d global entries\n", count)
-	for i := range s.Globals {
-		err = s.Globals[i].UnmarshalWASM(r)
-		if err != nil {
+	for i := 0; i < int(count); i++ {
+		global := GlobalEntry{}
+		if err = global.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Globals = append(s.Globals, global)
 	}
 	return nil
 }
@@ -589,7 +601,8 @@ func (s *SectionExports) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Entries = make(map[string]ExportEntry, count)
+
+	s.Entries = make(map[string]ExportEntry, 0)
 	for i := uint32(0); i < count; i++ {
 		var entry ExportEntry
 		err = entry.UnmarshalWASM(r)
@@ -703,12 +716,14 @@ func (s *SectionElements) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Entries = make([]ElementSegment, count)
-	for i := range s.Entries {
-		err = s.Entries[i].UnmarshalWASM(r)
-		if err != nil {
+
+	s.Entries = make([]ElementSegment, 0)
+	for i := 0; i < int(count); i++ {
+		element := ElementSegment{}
+		if err = element.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Entries = append(s.Entries, element)
 	}
 	return nil
 }
@@ -746,14 +761,13 @@ func (s *ElementSegment) UnmarshalWASM(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Elems = make([]uint32, numElems)
-
-	for i := range s.Elems {
+	s.Elems = make([]uint32, 0)
+	for i := 0; i < int(numElems); i++ {
 		e, err := leb128.ReadVarUint32(r)
 		if err != nil {
 			return err
 		}
-		s.Elems[i] = e
+		s.Elems = append(s.Elems, e)
 	}
 
 	return nil
@@ -793,14 +807,16 @@ func (s *SectionCode) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Bodies = make([]FunctionBody, count)
+	s.Bodies = make([]FunctionBody, 0)
 	logger.Printf("%d function bodies\n", count)
 
-	for i := range s.Bodies {
+	for i := 0; i < int(count); i++ {
 		logger.Printf("Reading function %d\n", i)
-		if err = s.Bodies[i].UnmarshalWASM(r); err != nil {
+		body := FunctionBody{}
+		if err = body.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Bodies = append(s.Bodies, body)
 	}
 	return nil
 }
@@ -832,9 +848,8 @@ func (f *FunctionBody) UnmarshalWASM(r io.Reader) error {
 		return err
 	}
 
-	body := make([]byte, bodySize)
-
-	if _, err = io.ReadFull(r, body); err != nil {
+	body, err := readBytes(r, uint64(bodySize))
+	if err != nil {
 		return err
 	}
 
@@ -844,12 +859,14 @@ func (f *FunctionBody) UnmarshalWASM(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	f.Locals = make([]LocalEntry, localCount)
+	f.Locals = make([]LocalEntry, 0)
 
-	for i := range f.Locals {
-		if err = f.Locals[i].UnmarshalWASM(bytesReader); err != nil {
+	for i := 0; i < int(localCount); i++ {
+		local := LocalEntry{}
+		if err = local.UnmarshalWASM(bytesReader); err != nil {
 			return err
 		}
+		f.Locals = append(f.Locals, local)
 	}
 
 	logger.Printf("bodySize: %d, localCount: %d\n", bodySize, localCount)
@@ -929,11 +946,13 @@ func (s *SectionData) ReadPayload(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	s.Entries = make([]DataSegment, count)
-	for i := range s.Entries {
-		if err = s.Entries[i].UnmarshalWASM(r); err != nil {
+	s.Entries = make([]DataSegment, 0)
+	for i := 0; i < int(count); i++ {
+		entry := DataSegment{}
+		if err = entry.UnmarshalWASM(r); err != nil {
 			return err
 		}
+		s.Entries = append(s.Entries, entry)
 	}
 	return nil
 }

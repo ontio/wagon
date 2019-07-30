@@ -9,16 +9,31 @@ import (
 	"io"
 
 	"github.com/go-interpreter/wagon/wasm/leb128"
+	"bytes"
+	"errors"
 )
+var ErrEof = errors.New("got EOF, can not get the next byte")
 
-func readBytes(r io.Reader, n int) ([]byte, error) {
-	bytes := make([]byte, n)
-	_, err := io.ReadFull(r, bytes)
-	if err != nil {
-		return bytes, err
+func readBytes(r io.Reader, n uint64) ([]byte, error) {
+	if n == 0 {
+		return nil, nil
 	}
-
-	return bytes, nil
+	if n < 2*1024*1024 {
+		p := make([]byte, n)
+		_, err := io.ReadFull(r, p)
+		if err != nil {
+			return nil, err
+		}
+		return p, nil
+	}
+	// normal path to avoid attack
+	limited := io.LimitReader(r, int64(n))
+	buf := &bytes.Buffer{}
+	num, _ := buf.ReadFrom(limited)
+	if num == int64(n) {
+		return buf.Bytes(), nil
+	}
+	return nil, ErrEof
 }
 
 func readBytesUint(r io.Reader) ([]byte, error) {
