@@ -83,6 +83,8 @@ type VM struct {
 
 	//memory limitation
 	MemoryLimitation uint64
+	//call stack depth
+	CallStackDepth uint32
 }
 
 // As per the WebAssembly spec: https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/Semantics.md#linear-memory
@@ -465,6 +467,14 @@ func (vm *VM) checkGas(gaslimit uint64) bool {
 		return true
 	}
 	return false
+}
+
+func (vm *VM) checkCallStackDepth() {
+	if vm.CallStackDepth <= 0 {
+		panic(ErrCallStackDepthExceed)
+	}
+	vm.CallStackDepth--
+
 }
 
 // Process is a proxy passed to host functions in order to access

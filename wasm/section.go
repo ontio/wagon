@@ -88,7 +88,7 @@ func (s *RawSection) GetRawSection() *RawSection {
 type InvalidSectionIDError SectionID
 
 func (e InvalidSectionIDError) Error() string {
-	return fmt.Sprintf("wasm: invalid section ID %d", e)
+	return fmt.Sprintf("wasm: invalid section ID %d", int(e))
 }
 
 type InvalidCodeIndexError int
@@ -628,7 +628,7 @@ func (s *SectionExports) WritePayload(w io.Writer) error {
 type DuplicateExportError string
 
 func (e DuplicateExportError) Error() string {
-	return fmt.Sprintf("Duplicate export entry: %s", e)
+	return fmt.Sprintf("Duplicate export entry: %s", string(e))
 }
 
 // ExportEntry represents an exported entry by the module
