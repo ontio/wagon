@@ -13,6 +13,11 @@ import (
 	ops "github.com/go-interpreter/wagon/wasm/operators"
 )
 
+const (
+	MAX_TABLE_SIZE       = 1024
+	MAX_LOCALENTRY_COUNT = 1024
+)
+
 // vibhavp: TODO: We do not verify whether blocks don't access for the parent block, do that.
 func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Module) (*mockVM, error) {
 	vm := &mockVM{
@@ -36,6 +41,9 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 	}
 
 	for _, entry := range body.Locals {
+		if entry.Count > uint32(MAX_LOCALENTRY_COUNT) {
+			return vm, ErrLocalEntryCount
+		}
 		vars := make([]operand, entry.Count)
 		for i := uint32(0); i < entry.Count; i++ {
 			vars[i].Type = entry.Type
@@ -370,6 +378,28 @@ func VerifyModule(module *wasm.Module) error {
 			return Error{vm.pc(), i, err}
 		}
 		logger.Printf("No errors in function %d", i)
+	}
+
+	err := verifySectionTables(module)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func verifySectionTables(m *wasm.Module) error {
+	for _, e := range m.Table.Entries {
+		if e.Limits.Initial > uint32(MAX_TABLE_SIZE) {
+			return SizeOverFlowError(e.Limits.Initial)
+		}
+
+		if e.Limits.Flags&0x1 != 0 && e.Limits.Maximum > uint32(MAX_TABLE_SIZE) {
+			return SizeOverFlowError(e.Limits.Initial)
+		} else {
+			e.Limits.Flags = 1
+			e.Limits.Maximum = MAX_TABLE_SIZE
+		}
 	}
 
 	return nil

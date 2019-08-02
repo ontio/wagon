@@ -5,9 +5,12 @@
 package wasm
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 )
+
+var ErrTableInitOffsetOverFlow = errors.New("wasm: table init offset over flow")
 
 type InvalidTableIndexError uint32
 
@@ -113,6 +116,9 @@ func (m *Module) populateTables() error {
 		table := m.TableIndexSpace[elem.Index]
 		//use uint64 to avoid overflow
 		if uint64(offset)+uint64(len(elem.Elems)) > uint64(len(table)) {
+			if uint64(offset)+uint64(len(elem.Elems)) > uint64(m.Table.Entries[elem.Index].Limits.Maximum) {
+				return ErrTableInitOffsetOverFlow
+			}
 			data := make([]uint32, uint64(offset)+uint64(len(elem.Elems)))
 			copy(data[offset:], elem.Elems)
 			copy(data, table)
