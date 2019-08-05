@@ -9,15 +9,15 @@ const (
 	MaxPageNum    = MaxMemorySize / WasmPageSize
 )
 
-func firstStepCalibrationOfSectionTables(m *Module) error {
+func checkTableLimits(m *Module) error {
 	if m.Table != nil {
 		for i, e := range m.Table.Entries {
-			if e.Limits.Initial > uint32(MaxTableSize) {
-				return SizeOverFlowError{"First Calibration Table", uint64(e.Limits.Initial), uint64(MaxTableSize)}
+			if e.Limits.Initial > MaxTableSize {
+				return OutsizeError{"First Calibration Table", uint64(e.Limits.Initial), uint64(MaxTableSize)}
 			}
 
-			if e.Limits.Flags&0x1 != 0 && e.Limits.Maximum > uint32(MaxTableSize) {
-				return SizeOverFlowError{"First Calibration Table", uint64(e.Limits.Maximum), uint64(MaxTableSize)}
+			if e.Limits.Flags&0x1 != 0 && e.Limits.Maximum > MaxTableSize {
+				return OutsizeError{"First Calibration Table", uint64(e.Limits.Maximum), uint64(MaxTableSize)}
 			} else {
 				m.Table.Entries[i].Limits.Flags = 1
 				m.Table.Entries[i].Limits.Maximum = MaxTableSize
@@ -28,15 +28,15 @@ func firstStepCalibrationOfSectionTables(m *Module) error {
 	return nil
 }
 
-func firstStepCalibrationOfSectionMemory(m *Module) error {
+func checkMemoryLimits(m *Module) error {
 	if m.Memory != nil {
 		for i, e := range m.Memory.Entries {
-			if e.Limits.Initial > uint32(MaxPageNum) {
-				return SizeOverFlowError{"First Calibration Memory", uint64(e.Limits.Initial), uint64(MaxPageNum)}
+			if e.Limits.Initial > MaxPageNum {
+				return OutsizeError{"First Calibration Memory", uint64(e.Limits.Initial), uint64(MaxPageNum)}
 			}
 
-			if e.Limits.Flags&0x1 != 0 && e.Limits.Maximum > uint32(MaxPageNum) {
-				return SizeOverFlowError{"First Calibration Memory", uint64(e.Limits.Maximum), uint64(MaxPageNum)}
+			if e.Limits.Flags&0x1 != 0 && e.Limits.Maximum > MaxPageNum {
+				return OutsizeError{"First Calibration Memory", uint64(e.Limits.Maximum), uint64(MaxPageNum)}
 			} else {
 				m.Memory.Entries[i].Limits.Flags = 1
 				m.Memory.Entries[i].Limits.Maximum = MaxPageNum
@@ -47,13 +47,13 @@ func firstStepCalibrationOfSectionMemory(m *Module) error {
 	return nil
 }
 
-func FirstStepCalibration(m *Module) error {
-	err := firstStepCalibrationOfSectionTables(m)
+func WasmCalibration(m *Module) error {
+	err := checkTableLimits(m)
 	if err != nil {
 		return err
 	}
 
-	err = firstStepCalibrationOfSectionMemory(m)
+	err = checkMemoryLimits(m)
 	if err != nil {
 		return err
 	}

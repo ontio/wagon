@@ -150,7 +150,7 @@ func ReadModule(r io.Reader, resolvePath ResolveFunc) (*Module, error) {
 		}
 	}
 
-	err = FirstStepCalibration(m)
+	err = WasmCalibration(m)
 	if err != nil {
 		return nil, err
 	}
