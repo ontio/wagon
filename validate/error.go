@@ -23,6 +23,7 @@ func (e Error) Error() string {
 }
 
 var ErrStackUnderflow = errors.New("validate: stack underflow")
+var ErrLocalEntryCount = errors.New("validate: function local entry cout overflow")
 
 type InvalidImmediateError struct {
 	ImmType string

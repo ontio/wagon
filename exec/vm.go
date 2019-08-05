@@ -88,7 +88,7 @@ type VM struct {
 }
 
 // As per the WebAssembly spec: https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/Semantics.md#linear-memory
-const wasmPageSize = 65536 // (64 KB)
+const wasmPageSize = wasm.WasmPageSize
 
 var endianess = binary.LittleEndian
 
