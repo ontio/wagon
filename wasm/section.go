@@ -259,7 +259,7 @@ func (s *SectionCustom) SectionID() SectionID {
 
 func (s *SectionCustom) ReadPayload(r io.Reader) error {
 	var err error
-	s.Name, err = readStringUint(r)
+	s.Name, err = readUTF8StringUint(r)
 	if err != nil {
 		return err
 	}
@@ -366,11 +366,11 @@ func (s *SectionImports) WritePayload(w io.Writer) error {
 
 func (i *ImportEntry) UnmarshalWASM(r io.Reader) error {
 	var err error
-	i.ModuleName, err = readStringUint(r)
+	i.ModuleName, err = readUTF8StringUint(r)
 	if err != nil {
 		return err
 	}
-	i.FieldName, err = readStringUint(r)
+	i.FieldName, err = readUTF8StringUint(r)
 	if err != nil {
 		return err
 	}
@@ -679,7 +679,7 @@ type ExportEntry struct {
 
 func (e *ExportEntry) UnmarshalWASM(r io.Reader) error {
 	var err error
-	e.FieldStr, err = readStringUint(r)
+	e.FieldStr, err = readUTF8StringUint(r)
 	if err != nil {
 		return err
 	}
@@ -874,7 +874,7 @@ func (f *FunctionBody) UnmarshalWASM(r io.Reader) error {
 		return err
 	}
 
-	body, err := readBytes(r, int(bodySize))
+	body, err := readBytes(r, bodySize)
 	if err != nil {
 		return err
 	}
@@ -1131,7 +1131,7 @@ func (*ModuleName) isNameSubsection() {}
 
 func (s *ModuleName) UnmarshalWASM(r io.Reader) error {
 	var err error
-	s.Name, err = readStringUint(r)
+	s.Name, err = readUTF8StringUint(r)
 	return err
 }
 
@@ -1221,7 +1221,7 @@ func (m NameMap) UnmarshalWASM(r io.Reader) error {
 		if err != nil {
 			return err
 		}
-		name, err := readStringUint(r)
+		name, err := readUTF8StringUint(r)
 		if err != nil {
 			return err
 		}
