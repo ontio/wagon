@@ -9,7 +9,7 @@ const (
 	MAX_PAGE_NUM    = MAX_MEMORY_SIZE / WASM_PAGE_SIZE
 )
 
-func firstStepCalibrationOfverifySectionTables(m *Module) error {
+func firstStepCalibrationOfSectionTables(m *Module) error {
 	for i, e := range m.Table.Entries {
 		if e.Limits.Initial > uint32(MAX_TABLE_SIZE) {
 			return SizeOverFlowError{"First Calibration Table", uint64(e.Limits.Initial), uint64(MAX_TABLE_SIZE)}
@@ -19,7 +19,7 @@ func firstStepCalibrationOfverifySectionTables(m *Module) error {
 			return SizeOverFlowError{"First Calibration Table", uint64(e.Limits.Maximum), uint64(MAX_TABLE_SIZE)}
 		} else {
 			m.Table.Entries[i].Limits.Flags = 1
-			m.Table.Entries[i].Limits.Maximum = MAX_PAGE_NUM
+			m.Table.Entries[i].Limits.Maximum = MAX_TABLE_SIZE
 		}
 	}
 
@@ -44,7 +44,7 @@ func firstStepCalibrationOfSectionMemory(m *Module) error {
 }
 
 func FirstStepCalibration(m *Module) error {
-	err := firstStepCalibrationOfverifySectionTables(m)
+	err := firstStepCalibrationOfSectionTables(m)
 	if err != nil {
 		return err
 	}
