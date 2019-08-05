@@ -150,6 +150,11 @@ func ReadModule(r io.Reader, resolvePath ResolveFunc) (*Module, error) {
 		}
 	}
 
+	err = WasmCalibration(m)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, fn := range []func() error{
 		m.populateGlobals,
 		m.populateFunctions,
