@@ -73,9 +73,3 @@ type NoSectionError wasm.SectionID
 func (e NoSectionError) Error() string {
 	return fmt.Sprintf("reference to non existant section (id %d) in module", wasm.SectionID(e))
 }
-
-type SizeOverFlowError uint32
-
-func (e SizeOverFlowError) Error() string {
-	return fmt.Sprintf("size (%u) over flow in module", SizeOverFlowError(e))
-}

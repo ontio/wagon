@@ -5,12 +5,19 @@
 package wasm
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
 
-var ErrTableInitOffsetOverFlow = errors.New("wasm: table init offset over flow")
+type SizeOverFlowError struct {
+	ImmType string
+	Size    uint64
+	Max     uint64
+}
+
+func (e SizeOverFlowError) Error() string {
+	return fmt.Sprintf("validate: %s size overflow (%v), max (%v)", e.ImmType, e.Size, e.Max)
+}
 
 type InvalidTableIndexError uint32
 
@@ -117,7 +124,7 @@ func (m *Module) populateTables() error {
 		//use uint64 to avoid overflow
 		if uint64(offset)+uint64(len(elem.Elems)) > uint64(len(table)) {
 			if uint64(offset)+uint64(len(elem.Elems)) > uint64(m.Table.Entries[elem.Index].Limits.Maximum) {
-				return ErrTableInitOffsetOverFlow
+				return SizeOverFlowError{"Table", uint64(offset) + uint64(len(elem.Elems)), uint64(m.Table.Entries[elem.Index].Limits.Maximum)}
 			}
 			data := make([]uint32, uint64(offset)+uint64(len(elem.Elems)))
 			copy(data[offset:], elem.Elems)
@@ -165,6 +172,10 @@ func (m *Module) populateLinearMemory() error {
 
 		memory := m.LinearMemoryIndexSpace[entry.Index]
 		if uint64(offset)+uint64(len(entry.Data)) > uint64(len(memory)) {
+			bound := uint64(m.Memory.Entries[entry.Index].Limits.Maximum * uint32(WASM_PAGE_SIZE))
+			if uint64(offset)+uint64(len(entry.Data)) > bound {
+				return SizeOverFlowError{"Memory", uint64(offset) + uint64(len(entry.Data)), bound}
+			}
 			data := make([]byte, uint64(offset)+uint64(len(entry.Data)))
 			copy(data, memory)
 			copy(data[offset:], entry.Data)
