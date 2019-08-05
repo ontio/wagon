@@ -35,10 +35,10 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 		localVariables = append(localVariables, operand{entry})
 	}
 
-	TotalArgCount := uint64(0)
+	totalArgCount := uint64(0)
 	for _, entry := range body.Locals {
-		TotalArgCount += uint64(entry.Count)
-		if TotalArgCount > uint64(wasm.MaxLocalEntryCount) {
+		totalArgCount += uint64(entry.Count)
+		if totalArgCount > uint64(wasm.MaxLocalEntryCount) {
 			return vm, ErrLocalEntryCount
 		}
 		vars := make([]operand, entry.Count)
