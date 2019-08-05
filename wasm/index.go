@@ -172,7 +172,7 @@ func (m *Module) populateLinearMemory() error {
 
 		memory := m.LinearMemoryIndexSpace[entry.Index]
 		if uint64(offset)+uint64(len(entry.Data)) > uint64(len(memory)) {
-			bound := uint64(m.Memory.Entries[entry.Index].Limits.Maximum * uint32(WASM_PAGE_SIZE))
+			bound := uint64(m.Memory.Entries[entry.Index].Limits.Maximum * uint32(WasmPageSize))
 			if uint64(offset)+uint64(len(entry.Data)) > bound {
 				return SizeOverFlowError{"Memory", uint64(offset) + uint64(len(entry.Data)), bound}
 			}
