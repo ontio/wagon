@@ -7,8 +7,10 @@ package validate
 
 import (
 	"bytes"
+	"errors"
 	"io"
 
+	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/wasm"
 	ops "github.com/go-interpreter/wagon/wasm/operators"
 )
@@ -375,6 +377,70 @@ func VerifyModule(module *wasm.Module) error {
 			return Error{vm.pc(), i, err}
 		}
 		logger.Printf("No errors in function %d", i)
+	}
+
+	return nil
+}
+
+type RustValidator struct {
+	code             *exec.CompiledModule
+	allocBufferIndex uint32
+	validateIndex    uint32
+}
+
+var rustValidator = func() RustValidator {
+	var validator RustValidator
+	m, err := wasm.ReadModule(bytes.NewReader(verifyCode), func(name string) (*wasm.Module, error) {
+		panic(errors.New("rust verify code does not have import entries"))
+	})
+	if err != nil {
+		panic(err)
+	}
+	compiled, err := exec.CompileModule(m)
+	if err != nil {
+		panic(err)
+	}
+
+	validator.code = compiled
+	entry, ok := m.Export.Entries["alloc_buffer"]
+	if !ok {
+		panic(errors.New("can not find alloc_buffer function"))
+	}
+	validator.allocBufferIndex = entry.Index
+	entry, ok = m.Export.Entries["wasm_validate"]
+	if !ok {
+		panic(errors.New("can not find wasm_validate function"))
+	}
+	validator.validateIndex = entry.Index
+
+	return validator
+}()
+
+func VerifyWasmCodeFromRust(code []byte) error {
+	vm, err := exec.NewVMWithCompiled(rustValidator.code, 50*1024*1024)
+	if err != nil {
+		return err
+	}
+
+	vm.RecoverPanic = true
+	vm.CallStackDepth = 20000
+	vm.AvaliableGas = &exec.Gas{GasLimit: 1000000000, GasPrice: 1}
+
+	ret, err := vm.ExecCode(int64(rustValidator.allocBufferIndex), uint64(len(code)))
+	if err != nil {
+		return err
+	}
+
+	codePtr := ret.(uint32)
+	copy(vm.Memory()[codePtr:], code)
+	ret, err = vm.ExecCode(int64(rustValidator.validateIndex), uint64(codePtr), uint64(len(code)))
+	if err != nil {
+		return err
+	}
+
+	valid := ret.(uint32)
+	if valid != 0 {
+		return errors.New("validation failed")
 	}
 
 	return nil
