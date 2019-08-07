@@ -6,6 +6,7 @@ package exec
 
 import (
 	"bytes"
+	"encoding/hex"
 	"reflect"
 	"testing"
 
@@ -256,19 +257,29 @@ func TestHostTerminate(t *testing.T) {
 
 //
 func TestInfiniteRecursion(t *testing.T) {
-	byteCode := []byte{
-		0x00, 0x61, 0x73, 0x6d, 0x30, 0x30, 0x30, 0x30, 0x01, 0x30,
-		0x01, 0x30, 0x00, 0x00, 0x03, 0x30, 0x01, 0x00, 0x07, 0x30,
-		0x01, 0x06, 0x69, 0x6e, 0x76, 0x6f, 0x6b, 0x65, 0x30, 0x00,
-		0x0a, 0x30, 0x01, 0x08, 0x00, 0x10, 0x00, 0x00, 0x30, 0x30,
-		0x30, 0x0b,
+	/*
+		(module
+		  (type $t0 (func (param i32) (result i32)))
+		  (func $invoke (export "invoke") (type $t0) (param $p0 i32) (result i32)
+		    get_local $p0
+		    call $invoke))
+	*/
+	byteCode, err := hex.DecodeString("0061736d0100000001060160017f017f03020100070a0106696e766f6b6500000a08010600200010000b")
+	if err != nil {
+		panic(err)
 	}
-	m, _ := wasm.ReadModule(bytes.NewReader(byteCode), func(name string) (*wasm.Module, error) {
+	m, err := wasm.ReadModule(bytes.NewReader(byteCode), func(name string) (*wasm.Module, error) {
 		return nil, fmt.Errorf("module %q unknown", name)
 	})
+	if err != nil {
+		panic(err)
+	}
 	// this code follows ontology/smartcontract/wasmvm/wasm_service.go:Invoke(), with
 	// some error checking removed for brevity.
-	compiled, _ := CompileModule(m)
+	compiled, err := CompileModule(m)
+	if err != nil {
+		panic(err)
+	}
 	vm, err := NewVMWithCompiled(compiled, 10*1024*1024)
 	if err != nil {
 		t.Fatalf("Could not instantiate vm: %v", err)
@@ -278,7 +289,6 @@ func TestInfiniteRecursion(t *testing.T) {
 	vm.CallStackDepth = 100000
 	entry, _ := compiled.RawModule.Export.Entries["invoke"]
 	index := int64(entry.Index)
-	_, err = vm.ExecCode(index)
-	assert.NotNil(t, err)
-	fmt.Printf("err:%s\n", err.Error())
+	_, err = vm.ExecCode(index, 0)
+	assert.Equal(t, err, ErrCallStackDepthExceed)
 }
