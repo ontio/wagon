@@ -234,7 +234,7 @@ func (g *GlobalVar) MarshalWASM(w io.Writer) error {
 		m = 1
 	}
 	return writeByte(w, m)
-	}
+}
 
 // Table describes a table in a Wasm module.
 type Table struct {
