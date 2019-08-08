@@ -258,9 +258,12 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 				return vm, err
 			}
 		case ops.CurrentMemory, ops.GrowMemory:
-			_, err := vm.fetchVarUint()
+			memIndex, err := vm.fetchByte()
 			if err != nil {
 				return vm, err
+			}
+			if memIndex != 0x00 {
+				return vm, errors.New("validate: memory index must be 0")
 			}
 
 		case ops.Call:
@@ -306,6 +309,17 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 			index, err := vm.fetchVarUint()
 			if err != nil {
 				return vm, err
+			}
+			tableIndex, err := vm.fetchByte()
+			if err != nil {
+				return vm, err
+			}
+			if tableIndex != 0x00 {
+				return vm, errors.New("validate: table index in call_indirect must be 0")
+			}
+
+			if index >= uint32(len(module.Types.Entries)) {
+				return vm, errors.New("validate: type index out of range in call_indirect")
 			}
 
 			fnExpectSig := module.Types.Entries[index]
