@@ -208,9 +208,9 @@ func (vm *VM) currentMemory() {
 func (vm *VM) growMemory() {
 	_ = vm.fetchInt8() // reserved (https://github.com/WebAssembly/design/blob/27ac254c854994103c24834a994be16f74f54186/BinaryEncoding.md#memory-related-operators-described-here)
 	curLen := len(vm.memory) / wasmPageSize
-	n := vm.popInt32()
+	n := vm.popUint32()
 
-	if uint64(len(vm.memory))+uint64(n*wasmPageSize) > vm.MemoryLimitation {
+	if uint64(n+uint32(len(vm.memory)/wasmPageSize)) > 2<<16 || uint64(len(vm.memory))+uint64(n*wasmPageSize) > vm.MemoryLimitation {
 		vm.pushInt32(-1)
 		return
 	}
