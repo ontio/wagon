@@ -6,7 +6,6 @@ package exec
 
 import (
 	"errors"
-	"fmt"
 	"math"
 )
 
@@ -212,7 +211,8 @@ func (vm *VM) growMemory() {
 	n := vm.popInt32()
 
 	if uint64(len(vm.memory))+uint64(n*wasmPageSize) > vm.MemoryLimitation {
-		panic(fmt.Errorf("growMemory exceed the limitation of %d", vm.MemoryLimitation))
+		vm.pushInt32(-1)
+		return
 	}
 
 	vm.memory = append(vm.memory, make([]byte, n*wasmPageSize)...)
