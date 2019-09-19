@@ -52,8 +52,9 @@ type context struct {
 }
 
 type Gas struct {
-	GasPrice uint64
-	GasLimit uint64
+	GasPrice  uint64
+	GasLimit  *uint64
+	GasFactor uint64
 }
 
 // VM is the execution context for executing WebAssembly bytecode.
@@ -472,8 +473,8 @@ outer:
 
 //check gas
 func (vm *VM) checkGas(gaslimit uint64) bool {
-	if vm.AvaliableGas.GasLimit >= gaslimit {
-		vm.AvaliableGas.GasLimit -= gaslimit
+	if *vm.AvaliableGas.GasLimit >= gaslimit {
+		*vm.AvaliableGas.GasLimit -= gaslimit
 		return true
 	}
 	return false
