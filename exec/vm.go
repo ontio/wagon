@@ -54,6 +54,7 @@ type context struct {
 type Gas struct {
 	GasPrice  uint64
 	GasLimit  *uint64
+	GasLimitL uint64
 	GasFactor uint64
 }
 
@@ -473,8 +474,16 @@ outer:
 
 //check gas
 func (vm *VM) checkGas(gaslimit uint64) bool {
-	if *vm.AvaliableGas.GasLimit >= gaslimit {
-		*vm.AvaliableGas.GasLimit -= gaslimit
+	vm.AvaliableGas.GasLimitL += gaslimit
+	normalizationGasLimit := vm.AvaliableGas.GasLimitL / vm.AvaliableGas.GasFactor
+
+	vm.AvaliableGas.GasLimitL = vm.AvaliableGas.GasLimitL % vm.AvaliableGas.GasFactor
+	if normalizationGasLimit == 0 {
+		return true
+	}
+
+	if *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
+		*vm.AvaliableGas.GasLimit -= normalizationGasLimit
 		return true
 	}
 	return false

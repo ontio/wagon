@@ -84,7 +84,7 @@ func TestHostCall(t *testing.T) {
 		t.Fatalf("Error creating VM: %v", vm)
 	}
 	GasLimit := uint64(1000000)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5}
 	vm.CallStackDepth = 1
 
 	vm.ExecCode(0)
@@ -192,7 +192,7 @@ func TestHostSymbolCall(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	GasLimit := uint64(1000000)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5}
 	vm.CallStackDepth = 1
 
 	rtrns, err := vm.ExecCode(1)
@@ -223,7 +223,7 @@ func TestGoFunctionCallChecksForFirstArgument(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	GasLimit := uint64(1000000)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5}
 	vm.CallStackDepth = 10000
 
 	_, err = vm.ExecCode(1)
@@ -247,7 +247,7 @@ func TestHostTerminate(t *testing.T) {
 		t.Fatalf("Could not instantiate vm: %v", err)
 	}
 	GasLimit := uint64(1000000)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit}
+	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5}
 	vm.CallStackDepth = 1
 
 	_, err = vm.ExecCode(1)
@@ -290,7 +290,7 @@ func TestInfiniteRecursion(t *testing.T) {
 	}
 	vm.RecoverPanic = true
 	GasLimit := uint64(100000000)
-	vm.AvaliableGas = &Gas{GasLimit: &GasLimit, GasPrice: 100}
+	vm.AvaliableGas = &Gas{GasLimit: &GasLimit, GasPrice: 100, GasFactor: 5}
 	vm.CallStackDepth = 100000
 	entry, _ := compiled.RawModule.Export.Entries["invoke"]
 	index := int64(entry.Index)

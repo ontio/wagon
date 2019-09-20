@@ -88,7 +88,7 @@ func ExampleVM_add() {
 		log.Fatalf("could not create wagon vm: %v", err)
 	}
 	GasLimit := uint64(math.MaxUint64)
-	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit}
+	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5}
 	vm.CallStackDepth = 1000
 	const fct1 = 2 // index of function fct1
 	out, err := vm.ExecCode(fct1)
