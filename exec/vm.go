@@ -466,7 +466,7 @@ outer:
 		}
 	}
 
-	if compiled.returns {
+	if compiled.returns && !vm.abort {
 		return vm.ctx.stack[len(vm.ctx.stack)-1], nil
 	}
 	return 0, nil
