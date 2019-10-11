@@ -101,7 +101,7 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 			switch retVal := wasm.ValueType(sig); retVal {
 			case wasm.ValueType(wasm.BlockTypeEmpty):
 				vm.pushFrame(op, nil, nil)
-			case wasm.ValueTypeI32, wasm.ValueTypeI64, wasm.ValueTypeF32, wasm.ValueTypeF64:
+			case wasm.ValueTypeI32, wasm.ValueTypeI64:
 				vm.pushFrame(op, nil, []wasm.ValueType{retVal})
 			default:
 				return vm, InvalidImmediateError{"block_type", opStruct.Name}
@@ -348,11 +348,11 @@ func verifyBody(fn *wasm.FunctionSig, body *wasm.FunctionBody, module *wasm.Modu
 				if align > 2 {
 					return vm, InvalidImmediateError{OpName: opStruct.Name, ImmType: "naturally aligned"}
 				}
-			case ops.I32Load, ops.I64Load32s, ops.I64Load32u, ops.F32Load:
+			case ops.I32Load, ops.I64Load32s, ops.I64Load32u:
 				if align > 4 {
 					return vm, InvalidImmediateError{OpName: opStruct.Name, ImmType: "naturally aligned"}
 				}
-			case ops.I64Load, ops.F64Load:
+			case ops.I64Load:
 				if align > 8 {
 					return vm, InvalidImmediateError{OpName: opStruct.Name, ImmType: "naturally aligned"}
 				}
