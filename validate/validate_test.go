@@ -159,24 +159,24 @@ func TestValidateAlignment(t *testing.T) {
 			},
 			err: InvalidImmediateError{OpName: "i64.load", ImmType: "naturally aligned"},
 		},
-		{
-			name: "f32.load alignment",
-			code: []byte{
-				// (f32.load align=8 (i32.const 0))
-				operators.I32Const, 0,
-				operators.F32Load, 8, 0,
-			},
-			err: InvalidImmediateError{OpName: "f32.load", ImmType: "naturally aligned"},
-		},
-		{
-			name: "f64.load alignment",
-			code: []byte{
-				// (f64.load align=16 (i32.const 0))
-				operators.I32Const, 0,
-				operators.F64Load, 16, 0,
-			},
-			err: InvalidImmediateError{OpName: "f64.load", ImmType: "naturally aligned"},
-		},
+		//{
+		//	name: "f32.load alignment",
+		//	code: []byte{
+		//		// (f32.load align=8 (i32.const 0))
+		//		operators.I32Const, 0,
+		//		operators.F32Load, 8, 0,
+		//	},
+		//	err: InvalidImmediateError{OpName: "f32.load", ImmType: "naturally aligned"},
+		//},
+		//{
+		//	name: "f64.load alignment",
+		//	code: []byte{
+		//		// (f64.load align=16 (i32.const 0))
+		//		operators.I32Const, 0,
+		//		operators.F64Load, 16, 0,
+		//	},
+		//	err: InvalidImmediateError{OpName: "f64.load", ImmType: "naturally aligned"},
+		//},
 	}
 
 	for i := range tcs {
@@ -309,52 +309,52 @@ func TestValidateFuncTypecheck(t *testing.T) {
 			},
 			err: ErrStackUnderflow,
 		},
-		{
-			name:     "voidfunc-f32",
-			fnReturn: noReturn,
-			code: []byte{
-				operators.F32Const, 0, 0, 0, 0,
-			},
-			err: InvalidTypeError{noReturn, wasm.ValueTypeF32},
-		},
-		{
-			name:     "f32func-f32",
-			fnReturn: wasm.ValueTypeF32,
-			code: []byte{
-				operators.F32Const, 0, 0, 0, 0,
-			},
-		},
-		{
-			name:     "f32func-void",
-			fnReturn: wasm.ValueTypeF32,
-			code: []byte{
-				operators.Nop,
-			},
-			err: ErrStackUnderflow,
-		},
-		{
-			name:     "voidfunc-f32",
-			fnReturn: noReturn,
-			code: []byte{
-				operators.F32Const, 0, 0, 0, 0,
-			},
-			err: InvalidTypeError{noReturn, wasm.ValueTypeF32},
-		},
-		{
-			name:     "f64func-f64",
-			fnReturn: wasm.ValueTypeF64,
-			code: []byte{
-				operators.F64Const, 0, 0, 0, 0, 0, 0, 0, 0,
-			},
-		},
-		{
-			name:     "f64func-void",
-			fnReturn: wasm.ValueTypeF64,
-			code: []byte{
-				operators.Nop,
-			},
-			err: ErrStackUnderflow,
-		},
+		//{
+		//	name:     "voidfunc-f32",
+		//	fnReturn: noReturn,
+		//	code: []byte{
+		//		operators.F32Const, 0, 0, 0, 0,
+		//	},
+		//	err: InvalidTypeError{noReturn, wasm.ValueTypeF32},
+		//},
+		//{
+		//	name:     "f32func-f32",
+		//	fnReturn: wasm.ValueTypeF32,
+		//	code: []byte{
+		//		operators.F32Const, 0, 0, 0, 0,
+		//	},
+		//},
+		//{
+		//	name:     "f32func-void",
+		//	fnReturn: wasm.ValueTypeF32,
+		//	code: []byte{
+		//		operators.Nop,
+		//	},
+		//	err: ErrStackUnderflow,
+		//},
+		//{
+		//	name:     "voidfunc-f32",
+		//	fnReturn: noReturn,
+		//	code: []byte{
+		//		operators.F32Const, 0, 0, 0, 0,
+		//	},
+		//	err: InvalidTypeError{noReturn, wasm.ValueTypeF32},
+		//},
+		//{
+		//	name:     "f64func-f64",
+		//	fnReturn: wasm.ValueTypeF64,
+		//	code: []byte{
+		//		operators.F64Const, 0, 0, 0, 0, 0, 0, 0, 0,
+		//	},
+		//},
+		//{
+		//	name:     "f64func-void",
+		//	fnReturn: wasm.ValueTypeF64,
+		//	code: []byte{
+		//		operators.Nop,
+		//	},
+		//	err: ErrStackUnderflow,
+		//},
 		{
 			name:     "resolve unreachable",
 			fnReturn: wasm.ValueTypeI64,
@@ -512,13 +512,13 @@ func TestValidateLocalsGlobals(t *testing.T) {
 			},
 			err: nil,
 		},
-		{
-			name: "get_global overflow",
-			code: []byte{
-				operators.GetGlobal, 2,
-			},
-			err: UnbalancedStackErr(wasm.ValueTypeF64),
-		},
+		//{
+		//	name: "get_global overflow",
+		//	code: []byte{
+		//		operators.GetGlobal, 2,
+		//	},
+		//	err: UnbalancedStackErr(wasm.ValueTypeF64),
+		//},
 		{
 			name: "get_global type mismatch",
 			code: []byte{
@@ -552,14 +552,14 @@ func TestValidateLocalsGlobals(t *testing.T) {
 			},
 			err: ErrStackUnderflow,
 		},
-		{
-			name: "set_global type mismatch",
-			code: []byte{
-				operators.F32Const, 0, 0, 0, 0,
-				operators.SetGlobal, 1,
-			},
-			err: InvalidTypeError{wasm.ValueTypeI64, wasm.ValueTypeF32},
-		},
+		//{
+		//	name: "set_global type mismatch",
+		//	code: []byte{
+		//		operators.F32Const, 0, 0, 0, 0,
+		//		operators.SetGlobal, 1,
+		//	},
+		//	err: InvalidTypeError{wasm.ValueTypeI64, wasm.ValueTypeF32},
+		//},
 	}
 
 	for i := range tcs {
@@ -571,7 +571,7 @@ func TestValidateLocalsGlobals(t *testing.T) {
 				GlobalIndexSpace: []wasm.GlobalEntry{
 					{Type: wasm.GlobalVar{Type: wasm.ValueTypeI32}},
 					{Type: wasm.GlobalVar{Type: wasm.ValueTypeI64}},
-					{Type: wasm.GlobalVar{Type: wasm.ValueTypeF64}},
+					//{Type: wasm.GlobalVar{Type: wasm.ValueTypeF64}},
 				},
 			}
 			sig := wasm.FunctionSig{Form: 0x60 /* Must always be 0x60 */}
@@ -581,7 +581,7 @@ func TestValidateLocalsGlobals(t *testing.T) {
 				Locals: []wasm.LocalEntry{
 					{Count: 1, Type: wasm.ValueTypeI32},
 					{Count: 1, Type: wasm.ValueTypeI64},
-					{Count: 1, Type: wasm.ValueTypeF64},
+					//{Count: 1, Type: wasm.ValueTypeF64},
 				},
 			}
 
@@ -693,46 +693,46 @@ func TestValidateBlockTypecheck(t *testing.T) {
 			},
 			err: ErrStackUnderflow,
 		},
-		{
-			name: "f64-void",
-			// (block (block (result f64) (f64.const 0)))
-			code: []byte{
-				operators.Block, byte(wasm.BlockTypeEmpty),
-				operators.Block, byte(wasm.ValueTypeF64), operators.F64Const, 0, 0, 0, 0, 0, 0, 0, 0, operators.End,
-				operators.End,
-			},
-			err: UnbalancedStackErr(wasm.ValueTypeF64),
-		},
-		{
-			name: "void-f64",
-			// (block (result f64) (block (nop)))
-			code: []byte{
-				operators.Block, byte(wasm.ValueTypeF64),
-				operators.Block, byte(wasm.BlockTypeEmpty), operators.Nop, operators.End,
-				operators.End,
-			},
-			err: ErrStackUnderflow,
-		},
-		{
-			name: "f32-void",
-			// (block (block (result f32) (f32.const 0)))
-			code: []byte{
-				operators.Block, byte(wasm.BlockTypeEmpty),
-				operators.Block, byte(wasm.ValueTypeF32), operators.F32Const, 0, 0, 0, 0, operators.End,
-				operators.End,
-			},
-			err: UnbalancedStackErr(wasm.ValueTypeF32),
-		},
-		{
-			name: "void-f32",
-			// (block (result f32) (block (nop)))
-			code: []byte{
-				operators.Block, byte(wasm.ValueTypeF32),
-				operators.Block, byte(wasm.BlockTypeEmpty), operators.Nop, operators.End,
-				operators.End,
-			},
-			err: ErrStackUnderflow,
-		},
+		//{
+		//	name: "f64-void",
+		//	// (block (block (result f64) (f64.const 0)))
+		//	code: []byte{
+		//		operators.Block, byte(wasm.BlockTypeEmpty),
+		//		operators.Block, byte(wasm.ValueTypeF64), operators.F64Const, 0, 0, 0, 0, 0, 0, 0, 0, operators.End,
+		//		operators.End,
+		//	},
+		//	err: UnbalancedStackErr(wasm.ValueTypeF64),
+		//},
+		//{
+		//	name: "void-f64",
+		//	// (block (result f64) (block (nop)))
+		//	code: []byte{
+		//		operators.Block, byte(wasm.ValueTypeF64),
+		//		operators.Block, byte(wasm.BlockTypeEmpty), operators.Nop, operators.End,
+		//		operators.End,
+		//	},
+		//	err: ErrStackUnderflow,
+		//},
+		//{
+		//	name: "f32-void",
+		//	// (block (block (result f32) (f32.const 0)))
+		//	code: []byte{
+		//		operators.Block, byte(wasm.BlockTypeEmpty),
+		//		operators.Block, byte(wasm.ValueTypeF32), operators.F32Const, 0, 0, 0, 0, operators.End,
+		//		operators.End,
+		//	},
+		//	err: UnbalancedStackErr(wasm.ValueTypeF32),
+		//},
+		//{
+		//	name: "void-f32",
+		//	// (block (result f32) (block (nop)))
+		//	code: []byte{
+		//		operators.Block, byte(wasm.ValueTypeF32),
+		//		operators.Block, byte(wasm.BlockTypeEmpty), operators.Nop, operators.End,
+		//		operators.End,
+		//	},
+		//	err: ErrStackUnderflow,
+		//},
 		{
 			name: "bad stack balance",
 			// (i32.const 0) (block (drop))
@@ -1101,16 +1101,16 @@ func TestValidateStackTypechecking(t *testing.T) {
 			},
 			err: nil,
 		},
-		{
-			name: "parameterized call type mismatch",
-			code: []byte{
-				operators.F32Const, 0, 0, 0, 0,
-				operators.I32Const, 2,
-				operators.Call, 1,
-				operators.Drop,
-			},
-			err: InvalidTypeError{wasm.ValueTypeI32, wasm.ValueTypeF32},
-		},
+		//{
+		//	name: "parameterized call type mismatch",
+		//	code: []byte{
+		//		operators.F32Const, 0, 0, 0, 0,
+		//		operators.I32Const, 2,
+		//		operators.Call, 1,
+		//		operators.Drop,
+		//	},
+		//	err: InvalidTypeError{wasm.ValueTypeI32, wasm.ValueTypeF32},
+		//},
 		{
 			name: "call indirect",
 			code: []byte{
@@ -1120,15 +1120,15 @@ func TestValidateStackTypechecking(t *testing.T) {
 			},
 			err: nil,
 		},
-		{
-			name: "call indirect invalid selector type",
-			code: []byte{
-				operators.F32Const, 0, 0, 0, 0,
-				operators.CallIndirect, 0, 0,
-				operators.Drop,
-			},
-			err: InvalidTypeError{wasm.ValueTypeI32, wasm.ValueTypeF32},
-		},
+		//{
+		//	name: "call indirect invalid selector type",
+		//	code: []byte{
+		//		operators.F32Const, 0, 0, 0, 0,
+		//		operators.CallIndirect, 0, 0,
+		//		operators.Drop,
+		//	},
+		//	err: InvalidTypeError{wasm.ValueTypeI32, wasm.ValueTypeF32},
+		//},
 		{
 			name: "call indirect non-zero table index",
 			code: []byte{
@@ -1178,19 +1178,19 @@ func TestValidateStackTypechecking(t *testing.T) {
 			},
 			err: InvalidTypeError{wasm.ValueTypeI32, wasm.ValueTypeI64},
 		},
-		{
-			name: "call indirect parameters return mismatch",
-			code: []byte{
-				operators.I32Const, 8,
-				operators.I32Const, 1,
-				operators.I32Const, 2,
-				operators.I32Const, 0,
-				operators.CallIndirect, 1, 0,
-				operators.I32Add,
-				operators.Drop,
-			},
-			err: InvalidTypeError{wasm.ValueTypeI32, wasm.ValueTypeF32},
-		},
+		//{
+		//	name: "call indirect parameters return mismatch",
+		//	code: []byte{
+		//		operators.I32Const, 8,
+		//		operators.I32Const, 1,
+		//		operators.I32Const, 2,
+		//		operators.I32Const, 0,
+		//		operators.CallIndirect, 1, 0,
+		//		operators.I32Add,
+		//		operators.Drop,
+		//	},
+		//	err: InvalidTypeError{wasm.ValueTypeI32, wasm.ValueTypeF32},
+		//},
 	}
 
 	for i := range tcs {
@@ -1211,7 +1211,7 @@ func TestValidateStackTypechecking(t *testing.T) {
 						Sig: &wasm.FunctionSig{
 							Form:        0x60,
 							ParamTypes:  []wasm.ValueType{wasm.ValueTypeI32, wasm.ValueTypeI32},
-							ReturnTypes: []wasm.ValueType{wasm.ValueTypeF32},
+							ReturnTypes: []wasm.ValueType{wasm.ValueTypeI64},
 						},
 					},
 				},
