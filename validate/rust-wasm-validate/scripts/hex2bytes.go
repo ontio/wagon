@@ -26,12 +26,14 @@ import (
 	"encoding/hex"
 )
 
-var verifyCode = func () []byte {
-	code, err := hex.DecodeString("%s")
+func decode(hexStr string) []byte {
+	code, err := hex.DecodeString(hexStr)
 	if err != nil {
 		panic(err)
 	}
 	return code
-}()
+}
+
+var verifyCode = decode("%s")
 `, hexStr)
 }

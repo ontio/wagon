@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasmi = "0.5.0"
-wasmparser = "0.35.1"
+wasmparser = {version="0.39", features=["deterministic"]}
 
 [profile.release]
 lto = true
