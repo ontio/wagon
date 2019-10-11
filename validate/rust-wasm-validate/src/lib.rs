@@ -22,7 +22,7 @@ pub extern "C" fn wasm_validate(code_ptr: *mut u8, code_len: usize) -> u32 {
         return 1;
     }
 
-    if !wasmparser::validate(
+    if wasmparser::validate(
         &code,
         Some(ValidatingParserConfig {
             operator_config: OperatorValidatorConfig {
@@ -31,10 +31,10 @@ pub extern "C" fn wasm_validate(code_ptr: *mut u8, code_len: usize) -> u32 {
                 enable_simd: false,
                 enable_bulk_memory: false,
                 enable_multi_value: false,
+                deterministic_only: true,
             },
-            mutable_global_imports: false,
         }),
-    ) {
+    ).is_err() {
         return 2;
     }
 
