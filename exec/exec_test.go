@@ -274,7 +274,8 @@ func runTest(fileName string, testCases []testCase, t testing.TB) {
 	}
 
 	GasLimit := uint64(math.MaxUint64)
-	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit}
+	ExecStep := uint64(math.MaxUint64)
+	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, ExecStep: &ExecStep}
 	vm.CallStackDepth = 1000
 	b, ok := t.(*testing.B)
 	for _, testCase := range testCases {
