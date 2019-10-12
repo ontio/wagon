@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"reflect"
 
 	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/wasm"
-	"math"
 )
 
 func ExampleVM_add() {
@@ -88,7 +88,8 @@ func ExampleVM_add() {
 		log.Fatalf("could not create wagon vm: %v", err)
 	}
 	GasLimit := uint64(math.MaxUint64)
-	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5}
+	ExecStep := uint64(math.MaxUint64)
+	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 1000
 	const fct1 = 2 // index of function fct1
 	out, err := vm.ExecCode(fct1)

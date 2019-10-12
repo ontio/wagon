@@ -8,11 +8,12 @@ package disasm
 import (
 	"bytes"
 	"errors"
+	"io"
+
 	"github.com/go-interpreter/wagon/internal/stack"
 	"github.com/go-interpreter/wagon/wasm"
 	"github.com/go-interpreter/wagon/wasm/leb128"
 	ops "github.com/go-interpreter/wagon/wasm/operators"
-	"io"
 )
 
 // Instr describes an instruction, consisting of an operator, with its
