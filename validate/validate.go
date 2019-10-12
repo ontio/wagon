@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"math"
 
 	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/wasm"
@@ -439,8 +440,8 @@ func VerifyWasmCodeFromRust(code []byte) error {
 	vm.RecoverPanic = true
 	vm.CallStackDepth = 20000
 
-	GasLimit := uint64(1000000000)
-	ExecStep := uint64(1000000000)
+	GasLimit := uint64(10000000000)
+	ExecStep := uint64(10000000000)
 	vm.AvaliableGas = &exec.Gas{GasLimit: &GasLimit, GasPrice: 1, GasFactor: 5, ExecStep: &ExecStep}
 
 	ret, err := vm.ExecCode(int64(rustValidator.allocBufferIndex), uint64(len(code)))
