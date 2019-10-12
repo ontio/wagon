@@ -8,8 +8,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/go-interpreter/wagon/wasm/leb128"
 	"io"
+
+	"github.com/go-interpreter/wagon/wasm/leb128"
 )
 
 const (

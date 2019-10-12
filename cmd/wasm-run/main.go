@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"os"
 
 	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/validate"
 	"github.com/go-interpreter/wagon/wasm"
-	"math"
 )
 
 func main() {
@@ -64,7 +64,8 @@ func run(w io.Writer, fname string, verify bool) {
 		log.Fatalf("could not create VM: %v", err)
 	}
 	GasLimit := uint64(1000000)
-	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5}
+	ExecStep := uint64(1000000)
+	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 10000
 	for name, e := range m.Export.Entries {
 		if e.Kind != wasm.ExternalFunction {

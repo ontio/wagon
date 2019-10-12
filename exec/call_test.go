@@ -7,13 +7,13 @@ package exec
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
+	"math"
 	"reflect"
 	"testing"
 
-	"fmt"
 	"github.com/go-interpreter/wagon/wasm"
 	"github.com/stretchr/testify/assert"
-	"math"
 )
 
 func TestHostCall(t *testing.T) {

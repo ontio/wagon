@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"reflect"
 
 	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/wasm"
-	"math"
 )
 
 func ExampleVM_add() {
