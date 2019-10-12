@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"math"
 
 	"github.com/go-interpreter/wagon/exec"
 	"github.com/go-interpreter/wagon/wasm"
