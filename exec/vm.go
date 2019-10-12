@@ -56,6 +56,8 @@ type Gas struct {
 	GasLimit        *uint64
 	LocalGasCounter uint64
 	GasFactor       uint64
+	StepCount       uint64
+	IgnoreStepGas   bool
 }
 
 // VM is the execution context for executing WebAssembly bytecode.
@@ -395,6 +397,11 @@ outer:
 		if !vm.checkGas(1) {
 			return 0, fmt.Errorf("exec:reach the gas limit")
 		}
+
+		if !vm.CheckExecStep() {
+			return 0, fmt.Errorf("exec:reach the maxStepCount")
+		}
+
 		op := vm.ctx.code[vm.ctx.pc]
 		vm.ctx.pc++
 		switch op {
@@ -474,6 +481,10 @@ outer:
 
 //check gas
 func (vm *VM) checkGas(gaslimit uint64) bool {
+	if vm.AvaliableGas.IgnoreStepGas {
+		return true
+	}
+
 	vm.AvaliableGas.LocalGasCounter += gaslimit
 	normalizationGasLimit := vm.AvaliableGas.LocalGasCounter / vm.AvaliableGas.GasFactor
 
@@ -487,6 +498,19 @@ func (vm *VM) checkGas(gaslimit uint64) bool {
 		return true
 	}
 	return false
+}
+
+func (vm *VM) CheckExecStep() bool {
+	if vm.AvaliableGas.IgnoreStepGas {
+		return true
+	}
+
+	if vm.AvaliableGas.StepCount >= uint64(8000000) {
+		return false
+	}
+
+	vm.AvaliableGas.StepCount += 1
+	return true
 }
 
 func (vm *VM) checkCallStackDepth() {

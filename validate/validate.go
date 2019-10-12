@@ -440,7 +440,7 @@ func VerifyWasmCodeFromRust(code []byte) error {
 	vm.CallStackDepth = 20000
 
 	GasLimit := uint64(1000000000)
-	vm.AvaliableGas = &exec.Gas{GasLimit: &GasLimit, GasPrice: 1, GasFactor: 5}
+	vm.AvaliableGas = &exec.Gas{GasLimit: &GasLimit, GasPrice: 1, GasFactor: 5, StepCount: 0, IgnoreStepGas: true}
 
 	ret, err := vm.ExecCode(int64(rustValidator.allocBufferIndex), uint64(len(code)))
 	if err != nil {
