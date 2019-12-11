@@ -52,11 +52,12 @@ type context struct {
 }
 
 type Gas struct {
-	GasPrice        uint64
-	GasLimit        *uint64
-	LocalGasCounter uint64
-	GasFactor       uint64
-	ExecStep        *uint64
+	GasPrice         uint64
+	GasLimit         *uint64
+	LocalGasCounter  uint64
+	GasFactor        uint64
+	ExecStep         *uint64
+	LocalStepCounter uint64
 }
 
 // VM is the execution context for executing WebAssembly bytecode.
@@ -393,15 +394,11 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 func (vm *VM) execCode(compiled compiledFunction) (uint64, error) {
 outer:
 	for int(vm.ctx.pc) < len(vm.ctx.code) && !vm.abort {
-		if !vm.checkGas(1) {
-			return 0, fmt.Errorf("exec:reach the gas limit")
-		}
-
-		if !vm.CheckExecStep() {
-			return 0, fmt.Errorf("exec:reach the maxStepCount")
-		}
-
 		op := vm.ctx.code[vm.ctx.pc]
+		if err := vm.checkGasAndStep(1, op); err != nil {
+			return 0, err
+		}
+
 		vm.ctx.pc++
 		switch op {
 		case ops.Return:
@@ -479,36 +476,35 @@ outer:
 }
 
 //check gas
-func (vm *VM) checkGas(gaslimit uint64) bool {
+func (vm *VM) checkGasAndStep(gaslimit uint64, op byte) error {
+	if *vm.AvaliableGas.ExecStep < vm.AvaliableGas.LocalStepCounter {
+		return fmt.Errorf("exec:reach the maxStepCount")
+	}
+
 	vm.AvaliableGas.LocalGasCounter += gaslimit
 	normalizationGasLimit := vm.AvaliableGas.LocalGasCounter / vm.AvaliableGas.GasFactor
-
-	switch vm.ctx.code[vm.ctx.pc] {
-	case ops.Block | ops.Br | ops.BrIf | ops.BrTable | ops.Loop | ops.If |
-		ops.Else | ops.CallIndirect | ops.Call | ops.Return | ops.End:
+	vm.AvaliableGas.LocalStepCounter += 1
+	switch op {
+	case ops.Block, ops.Br, ops.BrIf, ops.BrTable, ops.Loop, ops.If,
+		ops.Else, ops.CallIndirect, ops.Call, ops.Return, ops.End:
 		vm.AvaliableGas.LocalGasCounter = vm.AvaliableGas.LocalGasCounter % vm.AvaliableGas.GasFactor
+		*vm.AvaliableGas.ExecStep -= vm.AvaliableGas.LocalStepCounter
+		vm.AvaliableGas.LocalStepCounter = 0
 		if normalizationGasLimit == 0 {
-			return true
+			return nil
 		}
 		if *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
 			*vm.AvaliableGas.GasLimit -= normalizationGasLimit
-			return true
+			return nil
+		} else {
+			*vm.AvaliableGas.GasLimit = 0
 		}
 	default:
 		if normalizationGasLimit == 0 || *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
-			return true
+			return nil
 		}
 	}
-	return false
-}
-
-func (vm *VM) CheckExecStep() bool {
-	if *vm.AvaliableGas.ExecStep < 1 {
-		return false
-	}
-
-	*vm.AvaliableGas.ExecStep -= 1
-	return true
+	return fmt.Errorf("exec:reach the gas limit")
 }
 
 func (vm *VM) checkCallStackDepth() {
