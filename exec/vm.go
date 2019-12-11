@@ -483,14 +483,21 @@ func (vm *VM) checkGas(gaslimit uint64) bool {
 	vm.AvaliableGas.LocalGasCounter += gaslimit
 	normalizationGasLimit := vm.AvaliableGas.LocalGasCounter / vm.AvaliableGas.GasFactor
 
-	vm.AvaliableGas.LocalGasCounter = vm.AvaliableGas.LocalGasCounter % vm.AvaliableGas.GasFactor
-	if normalizationGasLimit == 0 {
-		return true
-	}
-
-	if *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
-		*vm.AvaliableGas.GasLimit -= normalizationGasLimit
-		return true
+	switch vm.ctx.code[vm.ctx.pc] {
+	case ops.Block | ops.Br | ops.BrIf | ops.BrTable | ops.Loop | ops.If |
+		ops.Else | ops.CallIndirect | ops.Call | ops.Return | ops.End:
+		vm.AvaliableGas.LocalGasCounter = vm.AvaliableGas.LocalGasCounter % vm.AvaliableGas.GasFactor
+		if normalizationGasLimit == 0 {
+			return true
+		}
+		if *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
+			*vm.AvaliableGas.GasLimit -= normalizationGasLimit
+			return true
+		}
+	default:
+		if normalizationGasLimit == 0 || *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
+			return true
+		}
 	}
 	return false
 }
