@@ -337,6 +337,8 @@ func Compile(disassembly []disasm.Instr) ([]byte, []*BranchTable) {
 	// function (ie, return)
 	addr := buffer.Len()
 	buffer.WriteByte(ops.Nop)
+	buffer.WriteByte(OpGasCounter)
+	binary.Write(buffer, binary.LittleEndian, scope_gas_counter)
 
 	// patch all references to the "root" block of the function body
 	for _, offset := range blocks[-1].patchOffsets {
