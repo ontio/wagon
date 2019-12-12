@@ -393,19 +393,17 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 func (vm *VM) execCode(compiled compiledFunction) (uint64, error) {
 outer:
 	for int(vm.ctx.pc) < len(vm.ctx.code) && !vm.abort {
-		if !vm.checkGas(1) {
-			return 0, fmt.Errorf("exec:reach the gas limit")
-		}
-
-		if !vm.CheckExecStep() {
-			return 0, fmt.Errorf("exec:reach the maxStepCount")
-		}
-
 		op := vm.ctx.code[vm.ctx.pc]
 		vm.ctx.pc++
 		switch op {
 		case ops.Return:
 			break outer
+		case compile.OpGasCounter:
+			costs := vm.fetchUint64()
+			err := vm.CheckExecLimit(costs)
+			if err != nil {
+				return 0, fmt.Errorf("exec: reach the Exec limit")
+			}
 		case compile.OpJmp:
 			vm.ctx.pc = vm.fetchInt64()
 			continue
@@ -493,6 +491,34 @@ func (vm *VM) checkGas(gaslimit uint64) bool {
 		return true
 	}
 	return false
+}
+
+//check gas
+func (vm *VM) CheckExecLimit(costs uint64) error {
+	if *vm.AvaliableGas.ExecStep < costs {
+		*vm.AvaliableGas.ExecStep = 0
+		return fmt.Errorf("exec step exhausted")
+	} else {
+		*vm.AvaliableGas.ExecStep -= costs
+	}
+
+	vm.AvaliableGas.LocalGasCounter += costs
+	normalizationGasLimit := vm.AvaliableGas.LocalGasCounter / vm.AvaliableGas.GasFactor
+
+	if normalizationGasLimit == 0 {
+		return nil
+	}
+
+	vm.AvaliableGas.LocalGasCounter = vm.AvaliableGas.LocalGasCounter % vm.AvaliableGas.GasFactor
+
+	if *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
+		*vm.AvaliableGas.GasLimit -= normalizationGasLimit
+	} else {
+		*vm.AvaliableGas.GasLimit = 0
+		return fmt.Errorf("gas exhausted")
+	}
+
+	return nil
 }
 
 func (vm *VM) CheckExecStep() bool {
