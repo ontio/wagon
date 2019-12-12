@@ -2,10 +2,10 @@
   "file": "gas_test.wasm",
   "tests": [
     {
-      "return": "i32:3",
+      "return": "i32:2",
       "args": [
         "i32:1",
-        "i32:2"
+        "i32:1"
       ],
       "function": "gas-add"
     },
@@ -36,14 +36,14 @@
     {
       "return": null,
       "args": [
-        "i32:1"
+        "i32:6"
       ],
       "function": "gas-set-x"
     },
     {
       "return": null,
       "args": [
-        "i32:10"
+        "i32:0"
       ],
       "function": "gas-empty-if"
     },
@@ -72,11 +72,11 @@
       "function": "gas-load_at_zero"
     },
     {
-      "return": "i32:0",
+      "return": "i32:1",
       "args": [
-        "i32:0",
         "i32:1",
-        "i32:2"
+        "i32:2",
+        "i32:1"
       ],
       "function": "gas-select_i32"
     },
