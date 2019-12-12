@@ -85,7 +85,7 @@ func TestHostCall(t *testing.T) {
 	}
 	GasLimit := uint64(1000000)
 	ExecStep := uint64(math.MaxUint64)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
+	vm.ExecMetrics = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 1
 
 	vm.ExecCode(0)
@@ -194,7 +194,7 @@ func TestHostSymbolCall(t *testing.T) {
 	}
 	GasLimit := uint64(1000000)
 	ExecStep := uint64(math.MaxUint64)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
+	vm.ExecMetrics = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 1
 
 	rtrns, err := vm.ExecCode(1)
@@ -226,7 +226,7 @@ func TestGoFunctionCallChecksForFirstArgument(t *testing.T) {
 	}
 	GasLimit := uint64(1000000)
 	ExecStep := uint64(math.MaxUint64)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
+	vm.ExecMetrics = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 10000
 
 	_, err = vm.ExecCode(1)
@@ -251,7 +251,7 @@ func TestHostTerminate(t *testing.T) {
 	}
 	GasLimit := uint64(1000000)
 	ExecStep := uint64(math.MaxUint64)
-	vm.AvaliableGas = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
+	vm.ExecMetrics = &Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 1
 
 	_, err = vm.ExecCode(1)
@@ -295,7 +295,7 @@ func TestInfiniteRecursion(t *testing.T) {
 	vm.RecoverPanic = true
 	GasLimit := uint64(100000000)
 	ExecStep := uint64(math.MaxUint64)
-	vm.AvaliableGas = &Gas{GasLimit: &GasLimit, GasPrice: 100, GasFactor: 5, ExecStep: &ExecStep}
+	vm.ExecMetrics = &Gas{GasLimit: &GasLimit, GasPrice: 100, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 100000
 	entry, _ := compiled.RawModule.Export.Entries["invoke"]
 	index := int64(entry.Index)

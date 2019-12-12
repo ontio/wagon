@@ -275,7 +275,7 @@ func runTest(fileName string, testCases []testCase, t testing.TB) {
 
 	GasLimit := uint64(math.MaxUint64)
 	ExecStep := uint64(math.MaxUint64)
-	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, ExecStep: &ExecStep}
+	vm.ExecMetrics = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, ExecStep: &ExecStep, GasFactor: 1}
 	vm.CallStackDepth = 1000
 	b, ok := t.(*testing.B)
 	for _, testCase := range testCases {
@@ -313,14 +313,17 @@ func runTest(fileName string, testCases []testCase, t testing.TB) {
 
 		var res interface{}
 		var err error
-
+		startGas := *vm.ExecMetrics.GasLimit
 		for i := 0; i < times; i++ {
 			res, err = vm.ExecCode(int64(index), args...)
 		}
 		if ok {
 			b.StopTimer()
 		}
-
+		endGas := *vm.ExecMetrics.GasLimit
+		if startGas-endGas != Gas_Map[testCase.Function] {
+			t.Fatalf("gas cost wrong,fileName:%s,function: %s: cost gas: %d,expected:%d", fileName, testCase.Function, startGas-endGas, Gas_Map[testCase.Function])
+		}
 		if err != nil && err.Error() != testCase.ErrorMsg {
 			t.Fatalf("%s, %s: %v", fileName, testCase.Function, err)
 		}
@@ -403,4 +406,28 @@ func TestNonSpec(t *testing.T) {
 
 func TestSpec(t *testing.T) {
 	//testModules(t, specTestsDir)
+}
+
+var Gas_Map = make(map[string]uint64, 0)
+
+func initGas() {
+	Gas_Map["gas-add"] = 4
+	Gas_Map["gas-empty-block"] = 5
+	Gas_Map["gas-type-i32-value-br"] = 4
+	Gas_Map["gas-as-br-value"] = 5
+	Gas_Map["gas-type-i32-value-br-table"] = 5
+	Gas_Map["gas-set-x"] = 3
+	Gas_Map["gas-empty-if"] = 3
+	Gas_Map["gas-type-second-i64"] = 6
+	Gas_Map["gas-empty-loop"] = 3
+	Gas_Map["gas-singular-loop"] = 4
+	Gas_Map["gas-load_at_zero"] = 3
+	Gas_Map["gas-select_i32"] = 5
+	Gas_Map["gas-stmt"] = 16
+	Gas_Map["gas-as-func-first"] = 3
+	Gas_Map["gas-type-i32"] = 3
+}
+func TestGas(t *testing.T) {
+	initGas()
+	testModules(t, "./testdata/testgas")
 }
