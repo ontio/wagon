@@ -258,7 +258,7 @@ func TestHostTerminate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)
 	}
-	if vm.abort == false || vm.ctx.pc > 0xa {
+	if vm.abort == false || vm.ctx.pc > 0x13 {
 		t.Fatalf("Terminate did not abort execution: abort=%v, pc=%#x", vm.abort, vm.ctx.pc)
 	}
 }
