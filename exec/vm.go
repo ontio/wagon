@@ -402,7 +402,7 @@ outer:
 			costs := vm.fetchUint64()
 			err := vm.CheckExecLimit(costs)
 			if err != nil {
-				return 0, fmt.Errorf("exec: reach the Exec limit")
+				return 0, fmt.Errorf("exec: reach the Exec limit %s", err)
 			}
 		case compile.OpJmp:
 			vm.ctx.pc = vm.fetchInt64()
@@ -477,27 +477,10 @@ outer:
 }
 
 //check gas
-func (vm *VM) checkGas(gaslimit uint64) bool {
-	vm.ExecMetrics.LocalGasCounter += gaslimit
-	normalizationGasLimit := vm.ExecMetrics.LocalGasCounter / vm.ExecMetrics.GasFactor
-
-	vm.ExecMetrics.LocalGasCounter = vm.ExecMetrics.LocalGasCounter % vm.ExecMetrics.GasFactor
-	if normalizationGasLimit == 0 {
-		return true
-	}
-
-	if *vm.ExecMetrics.GasLimit >= normalizationGasLimit {
-		*vm.ExecMetrics.GasLimit -= normalizationGasLimit
-		return true
-	}
-	return false
-}
-
-//check gas
 func (vm *VM) CheckExecLimit(costs uint64) error {
 	if *vm.ExecMetrics.ExecStep < costs {
 		*vm.ExecMetrics.ExecStep = 0
-		return fmt.Errorf("exec step exhausted")
+		return errors.New("exec step exhausted")
 	} else {
 		*vm.ExecMetrics.ExecStep -= costs
 	}
@@ -515,19 +498,10 @@ func (vm *VM) CheckExecLimit(costs uint64) error {
 		*vm.ExecMetrics.GasLimit -= normalizationGasLimit
 	} else {
 		*vm.ExecMetrics.GasLimit = 0
-		return fmt.Errorf("gas exhausted")
+		return errors.New("gas exhausted")
 	}
 
 	return nil
-}
-
-func (vm *VM) CheckExecStep() bool {
-	if *vm.ExecMetrics.ExecStep < 1 {
-		return false
-	}
-
-	*vm.ExecMetrics.ExecStep -= 1
-	return true
 }
 
 func (vm *VM) checkCallStackDepth() {
