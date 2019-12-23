@@ -80,7 +80,7 @@ type VM struct {
 	abort bool // Flag for host functions to terminate execution
 
 	//add for ontology gas limit
-	AvaliableGas *Gas
+	ExecMetrics *Gas
 
 	HostData interface{}
 
@@ -393,19 +393,17 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 func (vm *VM) execCode(compiled compiledFunction) (uint64, error) {
 outer:
 	for int(vm.ctx.pc) < len(vm.ctx.code) && !vm.abort {
-		if !vm.checkGas(1) {
-			return 0, fmt.Errorf("exec:reach the gas limit")
-		}
-
-		if !vm.CheckExecStep() {
-			return 0, fmt.Errorf("exec:reach the maxStepCount")
-		}
-
 		op := vm.ctx.code[vm.ctx.pc]
 		vm.ctx.pc++
 		switch op {
 		case ops.Return:
 			break outer
+		case compile.OpGasCounter:
+			costs := vm.fetchUint64()
+			err := vm.CheckExecLimit(costs)
+			if err != nil {
+				return 0, fmt.Errorf("exec: reach the Exec limit %s", err)
+			}
 		case compile.OpJmp:
 			vm.ctx.pc = vm.fetchInt64()
 			continue
@@ -479,29 +477,31 @@ outer:
 }
 
 //check gas
-func (vm *VM) checkGas(gaslimit uint64) bool {
-	vm.AvaliableGas.LocalGasCounter += gaslimit
-	normalizationGasLimit := vm.AvaliableGas.LocalGasCounter / vm.AvaliableGas.GasFactor
+func (vm *VM) CheckExecLimit(costs uint64) error {
+	if *vm.ExecMetrics.ExecStep < costs {
+		*vm.ExecMetrics.ExecStep = 0
+		return errors.New("exec step exhausted")
+	} else {
+		*vm.ExecMetrics.ExecStep -= costs
+	}
 
-	vm.AvaliableGas.LocalGasCounter = vm.AvaliableGas.LocalGasCounter % vm.AvaliableGas.GasFactor
+	vm.ExecMetrics.LocalGasCounter += costs
+	normalizationGasLimit := vm.ExecMetrics.LocalGasCounter / vm.ExecMetrics.GasFactor
+
 	if normalizationGasLimit == 0 {
-		return true
+		return nil
 	}
 
-	if *vm.AvaliableGas.GasLimit >= normalizationGasLimit {
-		*vm.AvaliableGas.GasLimit -= normalizationGasLimit
-		return true
-	}
-	return false
-}
+	vm.ExecMetrics.LocalGasCounter = vm.ExecMetrics.LocalGasCounter % vm.ExecMetrics.GasFactor
 
-func (vm *VM) CheckExecStep() bool {
-	if *vm.AvaliableGas.ExecStep < 1 {
-		return false
+	if *vm.ExecMetrics.GasLimit >= normalizationGasLimit {
+		*vm.ExecMetrics.GasLimit -= normalizationGasLimit
+	} else {
+		*vm.ExecMetrics.GasLimit = 0
+		return errors.New("gas exhausted")
 	}
 
-	*vm.AvaliableGas.ExecStep -= 1
-	return true
+	return nil
 }
 
 func (vm *VM) checkCallStackDepth() {

@@ -358,6 +358,7 @@ func NewDisassembly(fn wasm.Function, module *wasm.Module) (*Disassembly, error)
 
 		disas.Code = append(disas.Code, instr)
 		curIndex++
+
 	}
 
 	if logging {

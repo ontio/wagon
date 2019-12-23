@@ -89,7 +89,7 @@ func ExampleVM_add() {
 	}
 	GasLimit := uint64(math.MaxUint64)
 	ExecStep := uint64(math.MaxUint64)
-	vm.AvaliableGas = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
+	vm.ExecMetrics = &exec.Gas{GasPrice: 500, GasLimit: &GasLimit, GasFactor: 5, ExecStep: &ExecStep}
 	vm.CallStackDepth = 1000
 	const fct1 = 2 // index of function fct1
 	out, err := vm.ExecCode(fct1)
