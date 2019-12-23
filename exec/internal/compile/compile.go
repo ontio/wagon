@@ -78,6 +78,8 @@ var (
 	// OpDiscardPreserveTop discards a given number of elements from the
 	// execution stack, while preserving the value on the top of the stack.
 	OpDiscardPreserveTop byte = 0x05
+	// Carefully chose a byte nerver used.
+	OpGasCounter byte = 0x06
 )
 
 // Target is the "target" of a br_table instruction.
@@ -142,11 +144,21 @@ func Compile(disassembly []disasm.Instr) ([]byte, []*BranchTable) {
 	blocks := make(map[int]*block) // maps nesting depths (labels) to blocks
 
 	blocks[-1] = &block{}
+	scope_gas_counter := uint64(0)
 
 	for _, instr := range disassembly {
 		if instr.Unreachable {
 			continue
 		}
+
+		scope_gas_counter += 1
+		switch instr.Op.Code {
+		case ops.Unreachable, ops.Block, ops.Br, ops.BrIf, ops.BrTable, ops.Loop, ops.If, ops.Else, ops.CallIndirect, ops.Call, ops.Return, ops.End:
+			buffer.WriteByte(OpGasCounter)
+			binary.Write(buffer, binary.LittleEndian, scope_gas_counter)
+			scope_gas_counter = 0
+		}
+
 		switch instr.Op.Code {
 		//case ops.I32Load, ops.I64Load, ops.F32Load, ops.F64Load, ops.I32Load8s, ops.I32Load8u, ops.I32Load16s, ops.I32Load16u, ops.I64Load8s, ops.I64Load8u, ops.I64Load16s, ops.I64Load16u, ops.I64Load32s, ops.I64Load32u, ops.I32Store, ops.I64Store, ops.F32Store, ops.F64Store, ops.I32Store8, ops.I32Store16, ops.I64Store8, ops.I64Store16, ops.I64Store32:
 		case ops.I32Load, ops.I64Load, ops.I32Load8s, ops.I32Load8u, ops.I32Load16s, ops.I32Load16u, ops.I64Load8s, ops.I64Load8u, ops.I64Load16s, ops.I64Load16u, ops.I64Load32s, ops.I64Load32u, ops.I32Store, ops.I64Store, ops.I32Store8, ops.I32Store16, ops.I64Store8, ops.I64Store16, ops.I64Store32:
@@ -325,6 +337,8 @@ func Compile(disassembly []disasm.Instr) ([]byte, []*BranchTable) {
 	// function (ie, return)
 	addr := buffer.Len()
 	buffer.WriteByte(ops.Nop)
+	buffer.WriteByte(OpGasCounter)
+	binary.Write(buffer, binary.LittleEndian, scope_gas_counter+1)
 
 	// patch all references to the "root" block of the function body
 	for _, offset := range blocks[-1].patchOffsets {

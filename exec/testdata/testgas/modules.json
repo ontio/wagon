@@ -1,0 +1,98 @@
+[{
+  "file": "gas_test.wasm",
+  "tests": [
+    {
+      "return": "i32:2",
+      "args": [
+        "i32:1",
+        "i32:1"
+      ],
+      "function": "gas-add"
+    },
+    {
+      "return": null,
+      "args": [
+      ],
+      "function": "gas-empty-block"
+    },
+    {
+      "return": "i32:1",
+      "args": [
+      ],
+      "function": "gas-type-i32-value-br"
+    },
+    {
+      "return": "i32:1",
+      "args": [
+      ],
+      "function": "gas-as-br-value"
+    },
+    {
+      "return": "i32:0",
+      "args": [
+      ],
+      "function": "gas-type-i32-value-br-table"
+    },
+    {
+      "return": null,
+      "args": [
+        "i32:6"
+      ],
+      "function": "gas-set-x"
+    },
+    {
+      "return": null,
+      "args": [
+        "i32:0"
+      ],
+      "function": "gas-empty-if"
+    },
+    {
+      "return": "i64:64",
+      "args": [
+      ],
+      "function": "gas-type-second-i64"
+    },
+    {
+      "return": null,
+      "args": [
+      ],
+      "function": "gas-empty-loop"
+    },
+    {
+      "return": "i32:7",
+      "args": [
+      ],
+      "function": "gas-singular-loop"
+    },
+    {
+      "return": "i32:0",
+      "args": [
+      ],
+      "function": "gas-load_at_zero"
+    },
+    {
+      "return": "i32:1",
+      "args": [
+        "i32:1",
+        "i32:2",
+        "i32:1"
+      ],
+      "function": "gas-select_i32"
+    },
+    {
+      "return": "i32:1",
+      "args": [
+      ],
+      "function": "gas-as-func-first"
+    },
+    {
+      "return": "i32:0",
+      "args": [
+        "i32:0"
+      ],
+      "function": "gas-stmt"
+    }
+  ]
+}
+]
