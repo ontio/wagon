@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/go-interpreter/wagon/wasm"
+	"github.com/ontio/wagon/wasm"
 )
 
 func TestEncode(t *testing.T) {

@@ -9,9 +9,9 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/go-interpreter/wagon/wasm"
-	"github.com/go-interpreter/wagon/wasm/leb128"
-	ops "github.com/go-interpreter/wagon/wasm/operators"
+	"github.com/ontio/wagon/wasm"
+	"github.com/ontio/wagon/wasm/leb128"
+	ops "github.com/ontio/wagon/wasm/operators"
 )
 
 // mockVM is a minimal implementation of a virtual machine to

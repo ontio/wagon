@@ -9,7 +9,7 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/go-interpreter/wagon/wasm/leb128"
+	"github.com/ontio/wagon/wasm/leb128"
 )
 
 const currentVersion = 0x01
