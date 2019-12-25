@@ -7,9 +7,9 @@ package disasm
 import (
 	"bytes"
 
-	"github.com/go-interpreter/wagon/wasm"
-	"github.com/go-interpreter/wagon/wasm/leb128"
-	ops "github.com/go-interpreter/wagon/wasm/operators"
+	"github.com/ontio/wagon/wasm"
+	"github.com/ontio/wagon/wasm/leb128"
+	ops "github.com/ontio/wagon/wasm/operators"
 )
 
 // Assemble encodes a set of instructions into binary representation.

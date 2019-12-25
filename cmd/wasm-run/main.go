@@ -12,9 +12,9 @@ import (
 	"math"
 	"os"
 
-	"github.com/go-interpreter/wagon/exec"
-	"github.com/go-interpreter/wagon/validate"
-	"github.com/go-interpreter/wagon/wasm"
+	"github.com/ontio/wagon/exec"
+	"github.com/ontio/wagon/validate"
+	"github.com/ontio/wagon/wasm"
 )
 
 func main() {

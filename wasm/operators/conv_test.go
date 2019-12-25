@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-interpreter/wagon/wasm"
+	"github.com/ontio/wagon/wasm"
 )
 
 func TestNewConversionOp(t *testing.T) {

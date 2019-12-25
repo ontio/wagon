@@ -1,5 +1,5 @@
 language: go
-go_import_path: github.com/go-interpreter/wagon
+go_import_path: github.com/ontio/wagon
 os:
   - linux
 
@@ -19,6 +19,7 @@ matrix:
    - go: 1.12.x
      env:
        - COVERAGE="-cover -race"
+       - GO111MODULE="on"
    - go: 1.11.x
      env:
        - COVERAGE=""
