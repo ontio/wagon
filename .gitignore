@@ -1,2 +1,3 @@
 /validate/rust-wasm-validate/target
 .idea
+/tests/spectests

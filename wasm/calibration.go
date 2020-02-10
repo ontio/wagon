@@ -35,8 +35,10 @@ func checkMemoryLimits(m *Module) error {
 				return OutsizeError{"First Calibration Memory", uint64(e.Limits.Initial), uint64(MaxPageNum)}
 			}
 
-			if e.Limits.Flags&0x1 != 0 && e.Limits.Maximum > MaxPageNum {
-				return OutsizeError{"First Calibration Memory", uint64(e.Limits.Maximum), uint64(MaxPageNum)}
+			if e.Limits.Flags == 1 {
+				if e.Limits.Maximum > MaxPageNum {
+					return OutsizeError{"First Calibration Memory", uint64(e.Limits.Maximum), uint64(MaxPageNum)}
+				}
 			} else {
 				m.Memory.Entries[i].Limits.Flags = 1
 				m.Memory.Entries[i].Limits.Maximum = MaxPageNum
