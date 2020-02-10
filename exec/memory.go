@@ -19,9 +19,9 @@ func (vm *VM) fetchBaseAddr() int {
 
 // inBounds returns true when the next vm.fetchBaseAddr() + offset
 // indices are in bounds accesses to the linear memory.
-func (vm *VM) inBounds(offset int) bool {
-	addr := endianess.Uint32(vm.ctx.code[vm.ctx.pc:]) + uint32(vm.ctx.stack[len(vm.ctx.stack)-1])
-	return int(addr)+offset < len(vm.memory)
+func (vm *VM) inBounds(offset uint32) bool {
+	addr := uint64(endianess.Uint32(vm.ctx.code[vm.ctx.pc:])) + uint64(uint32(vm.ctx.stack[len(vm.ctx.stack)-1]))
+	return addr+uint64(offset) < uint64(len(vm.memory))
 }
 
 // curMem returns a slice to the memory segment pointed to by
