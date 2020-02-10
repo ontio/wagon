@@ -5,6 +5,7 @@
 package exec
 
 import (
+	"errors"
 	"math"
 	"math/bits"
 )
@@ -34,6 +35,9 @@ func (vm *VM) i32Mul() {
 func (vm *VM) i32DivS() {
 	v2 := vm.popInt32()
 	v1 := vm.popInt32()
+	if v1 == math.MinInt32 && v2 == -1 {
+		panic(errors.New("integer overflow"))
+	}
 	vm.pushInt32(v1 / v2)
 }
 
@@ -194,6 +198,9 @@ func (vm *VM) i64Mul() {
 func (vm *VM) i64DivS() {
 	v2 := vm.popInt64()
 	v1 := vm.popInt64()
+	if v1 == math.MinInt64 && v2 == -1 {
+		panic(errors.New("integer overflow"))
+	}
 	vm.pushInt64(v1 / v2)
 }
 
