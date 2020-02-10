@@ -221,6 +221,23 @@ func (vm *VM) Memory() []byte {
 	return vm.memory
 }
 
+func (vm *VM) GetExportIndex(name string) (uint32, bool) {
+	entry, ok := vm.module.Export.Entries[name]
+	if ok {
+		return entry.Index, true
+	}
+
+	return 0, false
+}
+
+func (vm *VM) GetGlobal(index uint32) (uint64, bool) {
+	if int64(index) >= int64(len(vm.globals)) {
+		return 0, false
+	}
+
+	return vm.globals[index], true
+}
+
 func (vm *VM) pushBool(v bool) {
 	if v {
 		vm.pushUint64(1)
