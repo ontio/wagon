@@ -25,6 +25,12 @@ func (e InvalidTableIndexError) Error() string {
 	return fmt.Sprintf("wasm: Invalid table to table index space: %d", uint32(e))
 }
 
+type UninitializedTableEntryError uint32
+
+func (e UninitializedTableEntryError) Error() string {
+	return fmt.Sprintf("wasm: Uninitialized table entry at index: %d", uint32(e))
+}
+
 type InvalidValueTypeInitExprError struct {
 	Wanted reflect.Kind
 	Got    reflect.Kind
@@ -122,16 +128,22 @@ func (m *Module) populateTables() error {
 
 		table := m.TableIndexSpace[elem.Index]
 		//use uint64 to avoid overflow
-		if uint64(offset)+uint64(len(elem.Elems)) > uint64(len(table)) {
-			if uint64(offset)+uint64(len(elem.Elems)) > uint64(m.Table.Entries[elem.Index].Limits.Maximum) {
-				return OutsizeError{"Table", uint64(offset) + uint64(len(elem.Elems)), uint64(m.Table.Entries[elem.Index].Limits.Maximum)}
+		totalSize := uint64(offset) + uint64(len(elem.Elems))
+		if totalSize > uint64(len(table)) {
+			maxAllowSize := uint64(m.Table.Entries[elem.Index].Limits.Maximum)
+			if totalSize > maxAllowSize {
+				return OutsizeError{"Table", totalSize, maxAllowSize}
 			}
-			data := make([]uint32, uint64(offset)+uint64(len(elem.Elems)))
-			copy(data[offset:], elem.Elems)
+			data := make([]TableEntry, totalSize)
 			copy(data, table)
+			for i, index := range elem.Elems {
+				data[offset+uint32(i)] = TableEntry{Index: index, Initialized: true}
+			}
 			m.TableIndexSpace[elem.Index] = data
 		} else {
-			copy(table[offset:], elem.Elems)
+			for i, index := range elem.Elems {
+				table[offset+uint32(i)] = TableEntry{Index: index, Initialized: true}
+			}
 		}
 	}
 
@@ -146,7 +158,12 @@ func (m *Module) GetTableElement(index int) (uint32, error) {
 		return 0, InvalidTableIndexError(index)
 	}
 
-	return m.TableIndexSpace[0][index], nil
+	entry := m.TableIndexSpace[0][index]
+	if !entry.Initialized {
+		return 0, UninitializedTableEntryError(index)
+	}
+
+	return entry.Index, nil
 }
 
 func (m *Module) populateLinearMemory() error {

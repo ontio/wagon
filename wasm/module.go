@@ -58,7 +58,7 @@ type Module struct {
 
 	// function indices into the global function space
 	// the limit of each table is its capacity (cap)
-	TableIndexSpace        [][]uint32
+	TableIndexSpace        [][]TableEntry
 	LinearMemoryIndexSpace [][]byte
 
 	imports struct {
@@ -67,6 +67,11 @@ type Module struct {
 		Tables   int
 		Memories int
 	}
+}
+
+type TableEntry struct {
+	Index       uint32
+	Initialized bool
 }
 
 // Custom returns a custom section with a specific name, if it exists.
@@ -138,7 +143,7 @@ func ReadModule(r io.Reader, resolvePath ResolveFunc) (*Module, error) {
 
 	m.LinearMemoryIndexSpace = make([][]byte, 1)
 	if m.Table != nil {
-		m.TableIndexSpace = make([][]uint32, int(len(m.Table.Entries)))
+		m.TableIndexSpace = make([][]TableEntry, int(len(m.Table.Entries)))
 	}
 
 	if m.Import != nil && resolvePath != nil {
