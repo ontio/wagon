@@ -4,7 +4,10 @@
 
 package exec
 
-import "errors"
+import (
+	"errors"
+	"github.com/ontio/wagon/wasm"
+)
 
 var (
 	// ErrSignatureMismatch is the error value used while trapping the VM when
@@ -41,7 +44,11 @@ func (vm *VM) callIndirect() {
 	if int(tableIndex) >= len(vm.module.TableIndexSpace[0]) {
 		panic(ErrUndefinedElementIndex)
 	}
-	elemIndex := vm.module.TableIndexSpace[0][tableIndex]
+	tableEntry := vm.module.TableIndexSpace[0][tableIndex]
+	if !tableEntry.Initialized {
+		panic(wasm.UninitializedTableEntryError(tableIndex))
+	}
+	elemIndex := tableEntry.Index
 	fnActual := vm.module.FunctionIndexSpace[elemIndex]
 
 	if len(fnExpect.ParamTypes) != len(fnActual.Sig.ParamTypes) {
