@@ -168,9 +168,9 @@ func CompileModule(module *wasm.Module) (*CompiledModule, error) {
 		case int64:
 			compiled.globals[i] = uint64(v)
 		case float32:
-			vm.globals[i] = uint64(math.Float32bits(v))
+			compiled.globals[i] = uint64(math.Float32bits(v))
 		case float64:
-			vm.globals[i] = uint64(math.Float64bits(v))
+			compiled.globals[i] = uint64(math.Float64bits(v))
 		}
 	}
 

@@ -20,10 +20,10 @@ matrix:
      env:
        - COVERAGE="-cover -race"
        - GO111MODULE="on"
-   - go: 1.11.x
+   - go: 1.13.x
      env:
        - COVERAGE=""
-   - go: 1.10.x
+   - go: 1.14.x
      env:
        - COVERAGE=""
    - go: master

@@ -401,11 +401,11 @@ func BenchmarkModules(b *testing.B) {
 }
 
 func TestNonSpec(t *testing.T) {
-	testModules(t, nonSpecTestsDir)
+	//testModules(t, nonSpecTestsDir)
 }
 
 func TestSpec(t *testing.T) {
-	testModules(t, specTestsDir)
+	//testModules(t, specTestsDir)
 }
 
 var Gas_Map = make(map[string]uint64, 0)

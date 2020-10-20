@@ -7,8 +7,8 @@ import (
 )
 
 var testPaths = []string{
-	"../wasm/testdata",
-	"../exec/testdata",
+	//"../wasm/testdata",
+	//"../exec/testdata",
 	"../exec/testdata/spec",
 }
 

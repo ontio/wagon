@@ -31,7 +31,7 @@ pub extern "C" fn wasm_validate(code_ptr: *mut u8, code_len: usize) -> u32 {
                 enable_simd: false,
                 enable_bulk_memory: false,
                 enable_multi_value: false,
-                deterministic_only: true,
+                deterministic_only: false,
             },
         }),
     ).is_err() {

@@ -153,7 +153,6 @@ func Compile(disassembly []disasm.Instr) ([]byte, []*BranchTable) {
 
 		scope_gas_counter += 1
 		switch instr.Op.Code {
-		case ops.I32Load, ops.I64Load, ops.F32Load, ops.F64Load, ops.I32Load8s, ops.I32Load8u, ops.I32Load16s, ops.I32Load16u, ops.I64Load8s, ops.I64Load8u, ops.I64Load16s, ops.I64Load16u, ops.I64Load32s, ops.I64Load32u, ops.I32Store, ops.I64Store, ops.F32Store, ops.F64Store, ops.I32Store8, ops.I32Store16, ops.I64Store8, ops.I64Store16, ops.I64Store32:
 		case ops.Unreachable, ops.Block, ops.Br, ops.BrIf, ops.BrTable, ops.Loop, ops.If, ops.Else, ops.CallIndirect, ops.Call, ops.Return, ops.End:
 			buffer.WriteByte(OpGasCounter)
 			binary.Write(buffer, binary.LittleEndian, scope_gas_counter)

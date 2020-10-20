@@ -6,6 +6,7 @@ package exec
 
 import (
 	"errors"
+
 	"github.com/ontio/wagon/wasm"
 )
 
